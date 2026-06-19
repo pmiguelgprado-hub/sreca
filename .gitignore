@@ -1,0 +1,28 @@
+# --- Secrets / credentials ---
+.env
+credentials.yaml
+config/credentials.yaml
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Data / DB (local, may contain consumption data → RGPD) ---
+*.sqlite
+*.sqlite3
+*.db
+data/local/
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+
+# --- OS ---
+.DS_Store

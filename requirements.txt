@@ -1,0 +1,8 @@
+# SRECA — stack coste-licencia 0 € (todo open source)
+streamlit       # dashboard
+requests        # cliente Open-Meteo (API gratuita)
+pyyaml          # config por-concejo
+pandas          # manejo de series horarias
+plotly          # gráficos dashboard
+pytest          # TDD
+# SQLite = stdlib (sqlite3), sin dependencia
