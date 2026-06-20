@@ -29,18 +29,22 @@ legal:
 # --- Participantes sintéticos MVP (perfiles parametrizables) ---
 # renta_priority: prioridad en escasez (mayor = atendido antes). Misión social.
 # flexible_loads: cargas desplazables a ventana solar. Ordeño NO va aquí (no-desplazable).
+# daily_kwh = consumo base diario esperado (no-flexible) del participante (parametrizable).
 participants:
   - id: mayor_diurno_1
     profile: residencial_mayor_diurno
     renta_priority: 3          # vulnerable → alta prioridad
+    daily_kwh: 8.0             # hogar mayor, presente de día
     flexible_loads: []
   - id: mayor_diurno_2
     profile: residencial_mayor_diurno
     renta_priority: 3
+    daily_kwh: 8.0
     flexible_loads: []
   - id: granja_lactea_1
     profile: ganadero_lacteo
     renta_priority: 1
+    daily_kwh: 25.0           # base no-flexible (ordeño + casa); cargas flexibles aparte
     flexible_loads:
       - tanque_frio_leche   # inercia térmica → pre-enfriar en ventana solar
       - acs_limpieza        # ACS limpieza sala ordeño → pre-calentar en ventana solar

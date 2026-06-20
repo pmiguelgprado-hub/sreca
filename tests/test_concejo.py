@@ -33,9 +33,11 @@ def test_loads_participants_with_flexible_loads():
     granja = by_id["granja_lactea_1"]
     assert granja.profile == "ganadero_lacteo"
     assert granja.renta_priority == 1
+    assert granja.daily_kwh == 25.0
     assert granja.flexible_loads == ["tanque_frio_leche", "acs_limpieza"]
     # mayor-diurno has no flexible loads (invariant: only farm has shiftable loads)
     assert by_id["mayor_diurno_1"].flexible_loads == []
+    assert by_id["mayor_diurno_1"].daily_kwh == 8.0
 
 
 def test_coefficient_mode_must_be_legal_value():

@@ -47,6 +47,7 @@ class Participant:
     id: str
     profile: str
     renta_priority: int
+    daily_kwh: float
     flexible_loads: list[str]
 
 
@@ -80,6 +81,7 @@ def load_concejo(name: str, config_dir: Path | None = None) -> ConcejoConfig:
             id=p["id"],
             profile=p["profile"],
             renta_priority=p["renta_priority"],
+            daily_kwh=p["daily_kwh"],
             flexible_loads=list(p.get("flexible_loads") or []),
         )
         for p in raw["participants"]
