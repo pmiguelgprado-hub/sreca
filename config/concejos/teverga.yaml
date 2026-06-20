@@ -13,7 +13,8 @@ pv:
   system_losses: 0.14      # pérdidas lumped (PVGIS). PR resultante ≈ 0.765
   noct_c: 45               # NOCT módulo (°C) — modelo térmico Tcell
   gamma_pmp_per_c: -0.0035 # coef. temperatura potencia mono-Si (-0.35 %/°C)
-# Sanity esperado: ~16700 kWh/año, yield ~1114 kWh/kWp (calibración test integración)
+# Sanity esperado (PVGIS 2026-06-20): ~17376 kWh/año, yield ~1158 kWh/kWp, PR ~0.795
+# (calibración test integración; Ruta A = PVGIS TMY SARAH2+horizonte, ver docs/2026-06-20-calibration-source-discrepancy.md)
 
 # --- Económico (precios parametrizables) ---
 prices:
