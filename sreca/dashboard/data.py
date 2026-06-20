@@ -19,9 +19,10 @@ class DashboardData:
     coefficient_mode: str
     gen: list[float]                       # 24h generation day-type (kWh)
     demand: dict[str, list[float]]         # participant -> 24h demand (kWh)
-    coefficients: dict[str, list[float]]   # participant -> 24h β
+    coefficients: dict[str, list[float]]   # participant -> 24h β (mean day-type summary)
     savings: dict[str, dict]               # participant -> {self_consumed_kwh, excess_kwh, eur_saved}
     load_shift: dict[str, list[int]]       # flexible load -> recommended solar-window hours (Route B)
+    ex_ante_schedule: dict[int, dict[str, list[float]]]  # month -> participant -> 24h β (legal §4)
 
 
 def _load_shift_recommendation(concejo: str, gen: list[float]) -> dict[str, list[int]]:
@@ -55,4 +56,5 @@ def load_dashboard_data(db_path: str) -> DashboardData | None:
         coefficients=db.read_coefficients(conn, run_id),
         savings=db.read_savings(conn, run_id),
         load_shift=_load_shift_recommendation(run["concejo"], gen),
+        ex_ante_schedule=db.read_ex_ante_schedule(conn, run_id),
     )

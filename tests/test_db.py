@@ -53,6 +53,19 @@ def test_demand_roundtrip(conn):
     assert out["a"] == pytest.approx(dem["a"])
 
 
+def test_ex_ante_schedule_roundtrip(conn):
+    db.insert_run(conn, "r1", "2026-06-21", "Teverga", "ex_ante")
+    schedule = {
+        1: {"a": [0.5, 0.5], "b": [0.5, 0.5]},
+        7: {"a": [0.7, 0.3], "b": [0.3, 0.7]},
+    }
+    db.insert_ex_ante_schedule(conn, "r1", schedule)
+    out = db.read_ex_ante_schedule(conn, "r1")
+    assert set(out) == {1, 7}
+    assert out[7]["a"] == pytest.approx([0.7, 0.3])
+    assert out[1]["b"] == pytest.approx([0.5, 0.5])
+
+
 def test_savings_roundtrip(conn):
     db.insert_run(conn, "r1", "2026-06-20", "Teverga", "ex_ante")
     db.insert_savings(conn, "r1", {

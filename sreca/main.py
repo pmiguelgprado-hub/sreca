@@ -6,10 +6,10 @@ ex-ante run to SQLite for the dashboard to read:
     PVGIS climatology → pv (day-type) → demand (per participant) → coefficients
                       → savings → store/db
 
-Route A is persisted as a single representative mean day-type for the MVP (spec §1: "1 run =
-compute a día-tipo"); the monthly ex-ante legal profile (schedule.build_ex_ante_schedule) is
-built+tested but not yet persisted/shown. Route B (load_shift) is computed on read by the
-dashboard from this generation + the concejo's flexible loads (placeholder sizing).
+Route A persists both a representative mean day-type (summary) AND the monthly ex-ante legal
+coefficient profile (schedule.build_ex_ante_schedule, spec §4/§6 — the artefact presented to
+the distribuidora). Route B (load_shift) is computed on read by the dashboard from the
+generation + the concejo's flexible loads (placeholder sizing).
 """
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ from sreca.forecast import pv as pv_mod
 from sreca.forecast.demand import daily_demand
 from sreca.optimize.coefficients import compute_coefficients
 from sreca.optimize.savings import compute_savings
+from sreca.optimize.schedule import build_ex_ante_schedule
 from sreca.store import db
 
 _DEFAULT_CLIMATOLOGY = (
@@ -61,6 +62,9 @@ def run_rebalance(
         beta, gen, demand, cfg.prices.retail_eur_kwh, cfg.prices.compensation_eur_kwh
     )
 
+    # Route A legal artefact: the monthly ex-ante coefficient profile (spec §4, §6).
+    schedule = build_ex_ante_schedule(climatology, cfg)
+
     run_id = run_id or uuid.uuid4().hex[:12]
     conn = db.connect(db_path)
     db.init_schema(conn)
@@ -70,6 +74,7 @@ def run_rebalance(
     db.insert_demand(conn, run_id, demand)
     db.insert_coefficients(conn, run_id, beta)
     db.insert_savings(conn, run_id, savings)
+    db.insert_ex_ante_schedule(conn, run_id, schedule)
     return run_id
 
 

@@ -3,6 +3,8 @@
 The Streamlit view (app.py) stays thin; all read/shape logic lives here and is unit-tested
 (streamlit-fidelity lesson: pure data layer + thin view).
 """
+import pytest
+
 from sreca import main
 from sreca.dashboard import data
 from sreca.store import db
@@ -34,6 +36,16 @@ def test_dashboard_data_recommends_flexible_loads_in_solar_window(tmp_path):
     assert "ordeno" not in d.load_shift
     for hours in d.load_shift.values():
         assert all(d.gen[h] > 0 for h in hours)  # inside the solar window
+
+
+def test_dashboard_data_includes_monthly_ex_ante_profile(tmp_path):
+    db_path = str(tmp_path / "sreca.sqlite")
+    main.run_rebalance("teverga", db_path)
+    d = data.load_dashboard_data(db_path)
+    assert set(d.ex_ante_schedule) == set(range(1, 13))
+    # each month: 24h β per participant, Σβ=1 per hour
+    for h in range(24):
+        assert sum(d.ex_ante_schedule[6][p][h] for p in d.ex_ante_schedule[6]) == pytest.approx(1.0)
 
 
 def test_load_dashboard_data_empty_db_returns_none(tmp_path):

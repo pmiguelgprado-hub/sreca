@@ -31,6 +31,9 @@ CREATE TABLE IF NOT EXISTS savings (
     run_id TEXT, participant_id TEXT,
     self_consumed_kwh REAL, excess_kwh REAL, eur_saved REAL
 );
+CREATE TABLE IF NOT EXISTS ex_ante_coefficients (
+    run_id TEXT, month INTEGER, participant_id TEXT, hour INTEGER, beta REAL
+);
 """
 
 
@@ -87,6 +90,18 @@ def insert_coefficients(conn, run_id, beta: dict[str, list[float]]) -> None:
     conn.commit()
 
 
+def insert_ex_ante_schedule(conn, run_id, schedule: dict[int, dict[str, list[float]]]) -> None:
+    """Persist the monthly ex-ante coefficient profile: {month: {participant_id: [β_h]}}."""
+    rows = [
+        (run_id, month, pid, h, b)
+        for month, by_pid in schedule.items()
+        for pid, series in by_pid.items()
+        for h, b in enumerate(series)
+    ]
+    conn.executemany("INSERT INTO ex_ante_coefficients VALUES (?,?,?,?,?)", rows)
+    conn.commit()
+
+
 def insert_savings(conn, run_id, savings: dict[str, Any]) -> None:
     rows = [
         (run_id, pid, _field(s, "self_consumed_kwh"), _field(s, "excess_kwh"), _field(s, "eur_saved"))
@@ -134,6 +149,19 @@ def read_demand(conn, run_id) -> dict[str, list[float]]:
 
 def read_coefficients(conn, run_id) -> dict[str, list[float]]:
     return _read_series_by_participant(conn, "coefficients", run_id, "beta")
+
+
+def read_ex_ante_schedule(conn, run_id) -> dict[int, dict[str, list[float]]]:
+    """Read the monthly ex-ante profile back: {month: {participant_id: [β_h]}}."""
+    cur = conn.execute(
+        "SELECT month, participant_id, hour, beta FROM ex_ante_coefficients "
+        "WHERE run_id=? ORDER BY month, participant_id, hour",
+        (run_id,),
+    )
+    out: dict[int, dict[str, list[float]]] = {}
+    for month, pid, _hour, beta in cur.fetchall():
+        out.setdefault(month, {}).setdefault(pid, []).append(beta)
+    return out
 
 
 def read_savings(conn, run_id) -> dict[str, dict]:

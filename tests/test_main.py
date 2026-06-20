@@ -33,6 +33,13 @@ def test_run_rebalance_populates_a_readable_run(tmp_path):
     assert set(savings) == pids
     assert all(s["self_consumed_kwh"] >= 0 for s in savings.values())
 
+    # monthly ex-ante legal profile persisted (12 months, Σβ=1 per month/hour)
+    schedule = db.read_ex_ante_schedule(conn, run_id)
+    assert set(schedule) == set(range(1, 13))
+    for month in (1, 7):
+        for h in range(24):
+            assert sum(schedule[month][p][h] for p in pids) == pytest.approx(1.0)
+
 
 def test_run_rebalance_records_ex_ante_mode(tmp_path):
     db_path = str(tmp_path / "sreca.sqlite")

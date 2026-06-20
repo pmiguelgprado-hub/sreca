@@ -32,7 +32,7 @@ def render(db_path: str = DEFAULT_DB) -> None:
 
     st.caption(
         f"Concejo: **{d.concejo}** · run `{d.run_id}` · modo `{d.coefficient_mode}` · "
-        "día-tipo medio anual (proxy MVP — perfil mensual ex-ante pendiente de cablear)"
+        "resumen sobre día-tipo medio anual; perfil legal mensual ex-ante abajo"
     )
 
     hours = list(range(24))
@@ -73,6 +73,23 @@ def render(db_path: str = DEFAULT_DB) -> None:
         )
     else:
         st.caption("Sin cargas flexibles configuradas para este concejo.")
+
+    # Route A legal artefact — monthly ex-ante coefficient profile (spec §4, revisable ≥4 meses)
+    if d.ex_ante_schedule:
+        st.subheader("Perfil ex-ante mensual de coeficientes de reparto (artefacto legal §4)")
+        st.caption("Coeficientes β_i,h presentados a la distribuidora. Revisable ≥4 meses (TED/1247/2021).")
+        months = {1: "Ene", 2: "Feb", 3: "Mar", 4: "Abr", 5: "May", 6: "Jun",
+                  7: "Jul", 8: "Ago", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dic"}
+        sel = st.selectbox("Mes", sorted(d.ex_ante_schedule),
+                           format_func=lambda m: months.get(m, str(m)))
+        by_pid = d.ex_ante_schedule[sel]
+        fig_b = go.Figure()
+        for pid, betas in by_pid.items():
+            fig_b.add_trace(go.Scatter(x=list(range(24)), y=betas, name=pid, mode="lines"))
+        fig_b.update_layout(xaxis_title="Hora", yaxis_title="β (cuota de reparto)",
+                            height=360, legend=dict(orientation="h"),
+                            yaxis=dict(range=[0, 1]))
+        st.plotly_chart(fig_b, width="stretch")
 
 
 if __name__ == "__main__":
