@@ -104,6 +104,12 @@ def read_runs(conn) -> list[dict]:
     return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
+def latest_run_id(conn) -> str | None:
+    """run_id of the most recently inserted run (by rowid), or None if empty."""
+    row = conn.execute("SELECT run_id FROM forecast_runs ORDER BY rowid DESC LIMIT 1").fetchone()
+    return row[0] if row else None
+
+
 def read_pv_forecast(conn, run_id) -> list[float]:
     cur = conn.execute(
         "SELECT gen_kwh FROM pv_forecast WHERE run_id=? ORDER BY hour", (run_id,)
