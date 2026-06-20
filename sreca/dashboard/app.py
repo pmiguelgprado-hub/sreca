@@ -17,7 +17,7 @@ def render(db_path: str = DEFAULT_DB) -> None:
     import plotly.graph_objects as go
     import streamlit as st
 
-    from sreca.dashboard.data import load_dashboard_data
+    from sreca.dashboard.data import community_kpis, load_dashboard_data
 
     st.set_page_config(page_title="SRECA", page_icon="☀️", layout="wide")
     st.title("☀️ SRECA — Comunidad Energética Local")
@@ -34,6 +34,15 @@ def render(db_path: str = DEFAULT_DB) -> None:
         f"Concejo: **{d.concejo}** · run `{d.run_id}` · modo `{d.coefficient_mode}` · "
         "resumen sobre día-tipo medio anual; perfil legal mensual ex-ante abajo"
     )
+
+    # KPI row — headline community metrics
+    k = community_kpis(d)
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Tasa autoconsumo colectivo", f"{k.self_consumption_rate * 100:.0f} %")
+    c2.metric("Cobertura demanda", f"{k.demand_coverage * 100:.0f} %")
+    c3.metric("Generación FV", f"{k.generation_kwh:.1f} kWh")
+    c4.metric("Ahorro comunidad", f"{k.savings_eur:.2f} €")
+    st.divider()
 
     hours = list(range(24))
 
@@ -59,8 +68,6 @@ def render(db_path: str = DEFAULT_DB) -> None:
         for pid, s in d.savings.items()
     ]
     st.dataframe(rows, width="stretch")
-    st.metric("Ahorro total comunidad (€/día-tipo)",
-              round(sum(s["eur_saved"] for s in d.savings.values()), 2))
 
     # Route B — la sinergia: desplazar cargas flexibles a la ventana solar
     st.subheader("Sinergia: desplazar cargas flexibles a la ventana solar")

@@ -48,6 +48,23 @@ def test_dashboard_data_includes_monthly_ex_ante_profile(tmp_path):
         assert sum(d.ex_ante_schedule[6][p][h] for p in d.ex_ante_schedule[6]) == pytest.approx(1.0)
 
 
+def test_community_kpis(tmp_path):
+    db_path = str(tmp_path / "sreca.sqlite")
+    main.run_rebalance("teverga", db_path)
+    d = data.load_dashboard_data(db_path)
+    k = data.community_kpis(d)
+
+    total_sc = sum(s["self_consumed_kwh"] for s in d.savings.values())
+    total_dem = sum(sum(v) for v in d.demand.values())
+
+    assert k.generation_kwh == pytest.approx(sum(d.gen))
+    assert k.savings_eur == pytest.approx(sum(s["eur_saved"] for s in d.savings.values()))
+    assert k.self_consumption_rate == pytest.approx(total_sc / sum(d.gen))
+    assert k.demand_coverage == pytest.approx(total_sc / total_dem)
+    assert 0 <= k.self_consumption_rate <= 1
+    assert 0 <= k.demand_coverage <= 1
+
+
 def test_load_dashboard_data_empty_db_returns_none(tmp_path):
     db_path = str(tmp_path / "empty.sqlite")
     conn = db.connect(db_path)

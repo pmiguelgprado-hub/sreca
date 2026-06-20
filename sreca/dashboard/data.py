@@ -25,6 +25,27 @@ class DashboardData:
     ex_ante_schedule: dict[int, dict[str, list[float]]]  # month -> participant -> 24h β (legal §4)
 
 
+@dataclass(frozen=True)
+class CommunityKPIs:
+    generation_kwh: float          # total FV generation over the day-type
+    savings_eur: float             # total community savings (€)
+    self_consumption_rate: float   # Σ self_consumed / Σ generation (0..1)
+    demand_coverage: float         # Σ self_consumed / Σ demand (0..1)
+
+
+def community_kpis(d: DashboardData) -> CommunityKPIs:
+    """Headline community metrics derived from a run (pure)."""
+    total_gen = sum(d.gen)
+    total_sc = sum(s["self_consumed_kwh"] for s in d.savings.values())
+    total_dem = sum(sum(v) for v in d.demand.values())
+    return CommunityKPIs(
+        generation_kwh=total_gen,
+        savings_eur=sum(s["eur_saved"] for s in d.savings.values()),
+        self_consumption_rate=(total_sc / total_gen) if total_gen else 0.0,
+        demand_coverage=(total_sc / total_dem) if total_dem else 0.0,
+    )
+
+
 def _load_shift_recommendation(concejo: str, gen: list[float]) -> dict[str, list[int]]:
     """Route B (spec §6, §9.1): recommend running flexible loads in the solar window.
 
