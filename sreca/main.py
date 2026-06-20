@@ -6,9 +6,10 @@ ex-ante run to SQLite for the dashboard to read:
     PVGIS climatology → pv (day-type) → demand (per participant) → coefficients
                       → savings → store/db
 
-Route A (ex-ante annual profile) is persisted as a single representative day-type for the
-MVP (spec §1: "1 run = compute a día-tipo"). Route B (load_shift) stays a standalone
-recommender until flexible-load sizing is added to the per-concejo config (fase 2).
+Route A is persisted as a single representative mean day-type for the MVP (spec §1: "1 run =
+compute a día-tipo"); the monthly ex-ante legal profile (schedule.build_ex_ante_schedule) is
+built+tested but not yet persisted/shown. Route B (load_shift) is computed on read by the
+dashboard from this generation + the concejo's flexible loads (placeholder sizing).
 """
 from __future__ import annotations
 

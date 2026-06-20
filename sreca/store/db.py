@@ -62,7 +62,7 @@ def insert_participants(conn, participants) -> None:
     conn.executemany(
         "INSERT OR REPLACE INTO participants VALUES (?,?,?,?,?)",
         [(p.id, getattr(p, "concejo", None), p.profile, p.renta_priority,
-          json.dumps(p.flexible_loads)) for p in participants],
+          json.dumps([getattr(f, "name", f) for f in p.flexible_loads])) for p in participants],
     )
     conn.commit()
 

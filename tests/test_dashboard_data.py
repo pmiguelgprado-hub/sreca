@@ -23,6 +23,19 @@ def test_load_dashboard_data_from_populated_db(tmp_path):
     assert len(d.demand) == 3
 
 
+def test_dashboard_data_recommends_flexible_loads_in_solar_window(tmp_path):
+    # Route B wired into the dashboard (the corrected-synergy thesis): flexible loads are
+    # recommended for the highest-generation hours; non-flexible (milking) never appears.
+    db_path = str(tmp_path / "sreca.sqlite")
+    main.run_rebalance("teverga", db_path)
+    d = data.load_dashboard_data(db_path)
+    assert "tanque_frio_leche" in d.load_shift
+    assert "acs_limpieza" in d.load_shift
+    assert "ordeno" not in d.load_shift
+    for hours in d.load_shift.values():
+        assert all(d.gen[h] > 0 for h in hours)  # inside the solar window
+
+
 def test_load_dashboard_data_empty_db_returns_none(tmp_path):
     db_path = str(tmp_path / "empty.sqlite")
     conn = db.connect(db_path)

@@ -30,7 +30,10 @@ def render(db_path: str = DEFAULT_DB) -> None:
         )
         return
 
-    st.caption(f"Concejo: **{d.concejo}** · run `{d.run_id}` · modo `{d.coefficient_mode}` · día-tipo (24 h)")
+    st.caption(
+        f"Concejo: **{d.concejo}** · run `{d.run_id}` · modo `{d.coefficient_mode}` · "
+        "día-tipo medio anual (proxy MVP — perfil mensual ex-ante pendiente de cablear)"
+    )
 
     hours = list(range(24))
 
@@ -58,6 +61,18 @@ def render(db_path: str = DEFAULT_DB) -> None:
     st.dataframe(rows, width="stretch")
     st.metric("Ahorro total comunidad (€/día-tipo)",
               round(sum(s["eur_saved"] for s in d.savings.values()), 2))
+
+    # Route B — la sinergia: desplazar cargas flexibles a la ventana solar
+    st.subheader("Sinergia: desplazar cargas flexibles a la ventana solar")
+    if d.load_shift:
+        st.caption("Recomendación (Route B). Dimensionado de cargas = PLACEHOLDER, pendiente datos reales de la granja.")
+        st.dataframe(
+            [{"Carga flexible": name, "Horas recomendadas (sol)": ", ".join(f"{h:02d}h" for h in hours)}
+             for name, hours in d.load_shift.items()],
+            width="stretch",
+        )
+    else:
+        st.caption("Sin cargas flexibles configuradas para este concejo.")
 
 
 if __name__ == "__main__":

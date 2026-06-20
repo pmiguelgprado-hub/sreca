@@ -34,7 +34,10 @@ def test_loads_participants_with_flexible_loads():
     assert granja.profile == "ganadero_lacteo"
     assert granja.renta_priority == 1
     assert granja.daily_kwh == 25.0
-    assert granja.flexible_loads == ["tanque_frio_leche", "acs_limpieza"]
+    assert [f.name for f in granja.flexible_loads] == ["tanque_frio_leche", "acs_limpieza"]
+    assert granja.flexible_loads[0].energy_kwh == 6.0
+    assert granja.flexible_loads[0].duration_h == 3
+    assert all(f.shiftable for f in granja.flexible_loads)
     # mayor-diurno has no flexible loads (invariant: only farm has shiftable loads)
     assert by_id["mayor_diurno_1"].flexible_loads == []
     assert by_id["mayor_diurno_1"].daily_kwh == 8.0

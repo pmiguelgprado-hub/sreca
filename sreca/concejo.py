@@ -10,6 +10,8 @@ from pathlib import Path
 
 import yaml
 
+from sreca.optimize.load_shift import FlexibleLoad
+
 _CONFIG_DIR = Path(__file__).resolve().parent.parent / "config" / "concejos"
 _LEGAL_MODES = {"ex_ante", "ex_post_dynamic"}
 
@@ -48,7 +50,7 @@ class Participant:
     profile: str
     renta_priority: int
     daily_kwh: float
-    flexible_loads: list[str]
+    flexible_loads: list[FlexibleLoad]
 
 
 @dataclass(frozen=True)
@@ -82,7 +84,10 @@ def load_concejo(name: str, config_dir: Path | None = None) -> ConcejoConfig:
             profile=p["profile"],
             renta_priority=p["renta_priority"],
             daily_kwh=p["daily_kwh"],
-            flexible_loads=list(p.get("flexible_loads") or []),
+            flexible_loads=[
+                FlexibleLoad(name=f["name"], energy_kwh=f["energy_kwh"], duration_h=f["duration_h"])
+                for f in (p.get("flexible_loads") or [])
+            ],
         )
         for p in raw["participants"]
     ]
