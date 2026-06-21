@@ -275,8 +275,8 @@ def render(db_path: str = DEFAULT_DB, concejo: str = DEFAULT_CONCEJO) -> None:
         f"""
         <div class="sreca-foot">
           <b>SRECA</b> · Propuesta para la Beca de Excelencia de la Fundación Caja Rural de
-          Asturias. Concejo piloto: {d.concejo}. Replicable a otros concejos añadiendo un
-          fichero de configuración.<br>
+          Asturias. Concejo piloto: {d.concejo}. Replicable a otros concejos asturianos con su
+          propia configuración y sus datos de recurso solar (PVGIS, gratis).<br>
           Fuentes: recurso solar PVGIS (JRC, año tipo), demografía INE 2025, pobreza energética
           AROPE 2025, marco legal RDL 7/2026 y Orden TED/1247/2021.
           Datos de consumo sintéticos, ilustrativos. Stack de coste 0 € en licencias.

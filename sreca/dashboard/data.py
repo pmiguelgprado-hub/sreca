@@ -6,6 +6,7 @@ here, so it unit-tests without a UI runtime.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
@@ -68,8 +69,15 @@ def _load_shift_recommendation(concejo: str, gen: list[float]) -> dict[str, list
     return recommend_flexible_load_shift(flex, gen)
 
 
+@lru_cache(maxsize=8)
 def _annual_headline(concejo: str) -> AnnualSummary | None:
-    """Honest full-year figures (8760h chain). Computed on read from config + climatology."""
+    """Honest full-year figures (8760h chain), memoised per process.
+
+    The 8760h solar-position loop is the one heavy computation here. Streamlit reruns the script
+    on every interaction (e.g. the month selectbox), so without this cache each rerun would
+    recompute the whole year. The climatology fixture is static, so per-process memoisation by
+    concejo is safe and correct. NOTE: the climatology source is currently Teverga-specific
+    (_CLIMATOLOGY); a second concejo needs its own resource-data fixture (fase 2)."""
     try:
         cfg = load_concejo(concejo.lower())
     except FileNotFoundError:

@@ -1,8 +1,11 @@
-# SRECA runtime, stack coste-licencia 0 € (todo open source). Pinned to the tested set.
-# SQLite = stdlib (sqlite3), sin dependencia. Probado con Python 3.14.
-streamlit==1.58.0   # dashboard
-plotly==6.8.0       # gráficos
-pandas==3.0.3       # series horarias
-numpy==2.4.6        # (dep de pandas, fijado por reproducibilidad)
-pyyaml==6.0.3       # config por-concejo
-requests==2.34.2    # cliente Open-Meteo (Ruta B, forecast)
+# SRECA runtime, stack coste-licencia 0 € (todo open source). SQLite = stdlib, sin dependencia.
+# Rangos, no pins exactos: Streamlit Community Cloud corre en Linux/Python <=3.13 y pandas 3.0
+# aún no publica wheel manylinux para 3.13 (sí en macOS). Con estos mínimos el resolver elige el
+# wheel disponible para el Python del despliegue. Verificado con pandas 3.0.3 (local, Py3.14) y
+# pandas 2.3.2 (lo que resuelve en Linux/Py3.13): ambos dan las mismas cifras.
+streamlit>=1.40     # dashboard
+plotly>=5.20        # gráficos
+pandas>=2.2         # series horarias
+numpy>=1.26         # (dep de pandas)
+pyyaml>=6.0         # config por-concejo
+requests>=2.31      # cliente Open-Meteo (Ruta B, forecast)

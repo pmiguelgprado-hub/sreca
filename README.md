@@ -70,5 +70,6 @@ repositorio a GitHub y apuntar Streamlit Cloud a `streamlit_app.py`.
 ## Contexto
 
 Propuesta para la Beca de Excelencia de la **Fundación Caja Rural de Asturias**. Proyecto de
-desarrollo rural que usa la energía como herramienta. Replicable a concejos en riesgo de
-despoblación (Somiedo, Ponga, Allande, Ibias, Degaña, Quirós…) a coste de copia casi nulo.
+desarrollo rural que usa la energía como herramienta. Replicable a otros concejos en riesgo de
+despoblación (Somiedo, Ponga, Allande, Ibias, Degaña, Quirós…) añadiendo su configuración y sus
+datos de recurso solar (PVGIS TMY, gratis); el software no cambia.
