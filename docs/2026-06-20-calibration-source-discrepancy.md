@@ -3,7 +3,7 @@ type: analysis
 status: open-decision
 tags: [sreca, pv, calibration, open-meteo, pvgis, data-source]
 created: 2026-06-20
-related: [[2026-06-19-sreca-mvp-design]]
+related: [docs/2026-06-19-sreca-mvp-design.md]
 ---
 
 # SRECA — PV calibration: source discrepancy (Open-Meteo ERA5 vs PVGIS SARAH2)

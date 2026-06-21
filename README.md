@@ -43,7 +43,7 @@ docs/              # spec de diseño + verificación legal 2026
 
 - Spec de diseño: `docs/2026-06-19-sreca-mvp-design.md`
 - Verificación legal 2026: `docs/2026-06-19-legal-verification-2026.md`
-- Memoria de beca (fuente, no duplicada): `~/.claude/plans/estoy-pensando-en-ideas-stateful-cascade.md`
+- Memoria de beca e investigación de partida: documento interno (no incluido en el repo).
 
 ## Setup
 

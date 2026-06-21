@@ -1,6 +1,6 @@
 """SRECA dashboard, thin Streamlit view over the pure data layer (sreca.dashboard.data).
 
-Launch:  cd ~/AIOS/projects/sreca && .venv/bin/streamlit run streamlit_app.py
+Launch (from the repo root):  streamlit run streamlit_app.py
 (The DB auto-seeds on first load if empty, so a fresh clone renders with no manual step.)
 
 All read/shape logic lives in data.py (unit-tested); this file only renders. Importing it

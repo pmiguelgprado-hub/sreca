@@ -130,6 +130,21 @@ def test_annual_energy_within_10pct_of_pvgis():
     assert yield_kwh_kwp == pytest.approx(1158.0, rel=0.10)
 
 
+def test_somiedo_annual_energy_within_10pct_of_pvgis():
+    # Second concejo carries the same calibration guarantee as Teverga, so its public dashboard
+    # numbers are not uncross-checked. PVGIS PVcalc 2026-06-21 (43.094,-6.255; 15 kWp, 35° south,
+    # loss=14, free-standing, horizon): E_y=16945. Model on its own TMY fixture lands at ~+0.2%.
+    from sreca.datasets import climatology_path
+
+    cfg = load_concejo("somiedo")
+    df = pd.read_csv(climatology_path("somiedo"))
+    annual_kwh = pv.annual_energy(df, cfg.site, cfg.pv)
+
+    expected = 16945.0  # PVGIS PVcalc canonical, same site/config
+    assert abs(annual_kwh - expected) / expected < 0.10, \
+        f"Somiedo annual {annual_kwh:.0f} kWh outside ±10% of {expected:.0f}"
+
+
 def test_annual_energy_horizon_agnostic_sum_matches_hourly():
     # internal consistency: annual_energy == Σ of hourly_energy series it produces
     cfg = load_concejo("teverga")

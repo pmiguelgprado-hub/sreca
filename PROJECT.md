@@ -4,13 +4,12 @@ status: active
 tags: [sreca, energia, autoconsumo, comunidad-energetica, beca, asturias]
 created: 2026-06-19
 updated: 2026-06-20
-related: [[project-sreca]], [[2026-06-19-sreca-mvp-design]], [[2026-06-19-legal-verification-2026]]
+related: [docs/2026-06-19-sreca-mvp-design.md, docs/2026-06-19-legal-verification-2026.md]
 ---
 
 # SRECA — PROJECT
 
-Nodo de proyecto AIOS. Código = este repo (git propio, sincronizado a GitHub bajo
-`pmiguelgprado-hub`, convención [[feedback-vault-project-organization]]).
+Documento de proyecto. El código vive en este repositorio.
 
 ## Qué es
 
@@ -50,9 +49,4 @@ Excelencia de la Fundación Caja Rural de Asturias**.
 
 - Spec de diseño MVP: `docs/2026-06-19-sreca-mvp-design.md`
 - Verificación legal 2026: `docs/2026-06-19-legal-verification-2026.md`
-- Memoria de beca (fuente única, no duplicar): `~/.claude/plans/estoy-pensando-en-ideas-stateful-cascade.md`
-- Handoff arranque: `~/AIOS/docs/handoffs/2026-06-19-sreca-design.md`
-
-## Memoria del sistema
-
-[[project-sreca]] (puntero en `MEMORY.md`).
+- Memoria de beca e investigación de partida: documento interno (no incluido en el repo).

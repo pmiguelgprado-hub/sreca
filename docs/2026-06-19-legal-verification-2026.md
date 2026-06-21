@@ -4,13 +4,13 @@ status: verified
 tags: [sreca, legal, autoconsumo, regulacion, 2026]
 created: 2026-06-19
 updated: 2026-06-19
-related: [[PROJECT]], [[2026-06-19-sreca-design]]
+related: [PROJECT.md]
 ---
 
 # SRECA — Verificación del marco legal vigente (junio 2026)
 
-Resuelve la **Open Decision #1** del handoff `~/AIOS/docs/handoffs/2026-06-19-sreca-design.md`
-(PRIORITARIO: re-verificar marco legal 2026 antes de diseñar el optimizador).
+Resuelve la **Open Decision #1** de diseño (re-verificar el marco legal 2026 antes de diseñar
+el optimizador).
 Fuentes primarias: BOE + MITECO. La memoria de beca se redactó con el mapa legal de
 **oct-2025** (audiencia pública); este doc lo actualiza a la realidad de **junio 2026**.
 
@@ -83,10 +83,10 @@ Se introduce una abstracción `coefficient_mode` con dos valores:
 Esto hace el diseño robusto a la incertidumbre residual: que el RD dedicado se apruebe en
 julio o en diciembre **no cambia el MVP**.
 
-## Deltas para la memoria de beca (flag a Pablo — NO reescribir este sesión)
+## Deltas para la memoria de beca (pendiente antes de la entrega)
 
-La memoria de beca (`~/.claude/plans/estoy-pensando-en-ideas-stateful-cascade.md`) tiene
-afirmaciones legales que conviene actualizar antes de la entrega:
+La memoria de beca (documento interno) tiene afirmaciones legales que conviene actualizar
+antes de la entrega:
 
 1. **Proximidad 2 km → 5 km** (Bloque 1.1, Resumen). RDL 7/2026 amplió a 5 km. Esto
    *fortalece* el argumento de aldeas dispersas (ya no hay que clusterizar tanto).

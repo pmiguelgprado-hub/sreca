@@ -4,19 +4,18 @@ status: approved
 tags: [sreca, design, mvp, autoconsumo, energia]
 created: 2026-06-19
 updated: 2026-06-19
-related: [[PROJECT]], [[2026-06-19-legal-verification-2026]], [[2026-06-19-sreca-design]]
+related: [PROJECT.md, docs/2026-06-19-legal-verification-2026.md]
 ---
 
 # SRECA — Spec de diseño (MVP)
 
-Diseño aprobado (brainstorming 2026-06-19) del **cerebro software de SRECA**: Comunidad
-Energética Local en Teverga, autoconsumo colectivo FV 15 kWp gestionado por analítica
-predictiva. Stack coste-licencia **0 €**. Multi-sesión: este spec cubre el MVP; fase 2 al final.
+Diseño aprobado (2026-06-19) del **cerebro software de SRECA**: Comunidad Energética Local en
+Teverga, autoconsumo colectivo FV 15 kWp gestionado por analítica predictiva. Stack
+coste-licencia **0 €**. Multi-sesión: este spec cubre el MVP; fase 2 al final.
 
 Fuentes que NO se duplican aquí (referenciar):
-- Investigación + memoria de beca: `~/.claude/plans/estoy-pensando-en-ideas-stateful-cascade.md`
+- Investigación + memoria de beca: documento interno (no incluido en el repo).
 - Verificación legal 2026 (resuelve Open Decision #1): `docs/2026-06-19-legal-verification-2026.md`
-- Handoff de arranque: `~/AIOS/docs/handoffs/2026-06-19-sreca-design.md`
 
 ## 1. Objetivo del MVP
 
