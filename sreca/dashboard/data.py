@@ -6,10 +6,17 @@ here, so it unit-tests without a UI runtime.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
+
+import pandas as pd
 
 from sreca.concejo import load_concejo
 from sreca.optimize.load_shift import recommend_flexible_load_shift
+from sreca.report import AnnualSummary, annual_summary
 from sreca.store import db
+
+# Same climatology source main.py runs the year on (PVGIS TMY, committed). Single source of truth.
+_CLIMATOLOGY = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "teverga_climatology_hourly.csv"
 
 
 @dataclass(frozen=True)
@@ -23,6 +30,7 @@ class DashboardData:
     savings: dict[str, dict]               # participant -> {self_consumed_kwh, excess_kwh, eur_saved}
     load_shift: dict[str, list[int]]       # flexible load -> recommended solar-window hours (Route B)
     ex_ante_schedule: dict[int, dict[str, list[float]]]  # month -> participant -> 24h β (legal §4)
+    annual: AnnualSummary | None           # honest full-year headline (8760h chain, not day-type×365)
 
 
 @dataclass(frozen=True)
@@ -60,6 +68,17 @@ def _load_shift_recommendation(concejo: str, gen: list[float]) -> dict[str, list
     return recommend_flexible_load_shift(flex, gen)
 
 
+def _annual_headline(concejo: str) -> AnnualSummary | None:
+    """Honest full-year figures (8760h chain). Computed on read from config + climatology."""
+    try:
+        cfg = load_concejo(concejo.lower())
+    except FileNotFoundError:
+        return None
+    if not _CLIMATOLOGY.exists():
+        return None
+    return annual_summary(cfg, pd.read_csv(_CLIMATOLOGY))
+
+
 def load_dashboard_data(db_path: str) -> DashboardData | None:
     """Load the most recent run, or None if the database has no runs."""
     conn = db.connect(db_path)
@@ -78,4 +97,5 @@ def load_dashboard_data(db_path: str) -> DashboardData | None:
         savings=db.read_savings(conn, run_id),
         load_shift=_load_shift_recommendation(run["concejo"], gen),
         ex_ante_schedule=db.read_ex_ante_schedule(conn, run_id),
+        annual=_annual_headline(run["concejo"]),
     )

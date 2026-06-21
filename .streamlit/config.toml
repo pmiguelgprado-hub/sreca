@@ -1,0 +1,15 @@
+# SRECA theme: warm light, like a rural cooperative's printed report (not a SaaS dashboard).
+# Paper-tinted neutrals, deep warm ink, amber as the solar signal. No pure black/white.
+[theme]
+base = "light"
+primaryColor = "#D98A2B"          # amber: the sun / generation signal
+backgroundColor = "#F7F3EC"       # warm paper
+secondaryBackgroundColor = "#FCF9F3"
+textColor = "#2C2A26"             # deep warm ink, not #000
+font = "sans serif"
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false

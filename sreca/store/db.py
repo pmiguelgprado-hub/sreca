@@ -120,8 +120,17 @@ def read_runs(conn) -> list[dict]:
 
 
 def latest_run_id(conn) -> str | None:
-    """run_id of the most recently inserted run (by rowid), or None if empty."""
-    row = conn.execute("SELECT run_id FROM forecast_runs ORDER BY rowid DESC LIMIT 1").fetchone()
+    """run_id of the most recently inserted run (by rowid), or None if empty/uninitialised.
+
+    Tolerates a brand-new DB with no schema yet (fresh clone): returns None so callers can
+    seed it, rather than raising ``no such table``.
+    """
+    try:
+        row = conn.execute(
+            "SELECT run_id FROM forecast_runs ORDER BY rowid DESC LIMIT 1"
+        ).fetchone()
+    except sqlite3.OperationalError:
+        return None
     return row[0] if row else None
 
 

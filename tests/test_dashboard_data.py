@@ -65,6 +65,19 @@ def test_community_kpis(tmp_path):
     assert 0 <= k.demand_coverage <= 1
 
 
+def test_dashboard_data_includes_honest_annual_headline(tmp_path):
+    db_path = str(tmp_path / "sreca.sqlite")
+    main.run_rebalance("teverga", db_path)
+    d = data.load_dashboard_data(db_path)
+    assert d.annual is not None
+    assert d.annual.gen_kwh > 0
+    assert 0 <= d.annual.self_consumption_rate <= 1
+    # honest annual must not exceed the inflated day-type×365 self-consumption rate (Jensen guard)
+    daytype_sc = sum(s["self_consumed_kwh"] for s in d.savings.values())
+    daytype_rate = daytype_sc / sum(d.gen)
+    assert d.annual.self_consumption_rate <= daytype_rate + 1e-9
+
+
 def test_load_dashboard_data_empty_db_returns_none(tmp_path):
     db_path = str(tmp_path / "empty.sqlite")
     conn = db.connect(db_path)

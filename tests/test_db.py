@@ -21,6 +21,13 @@ def test_init_schema_creates_all_tables(conn):
             "demand_forecast", "coefficients", "savings"} <= names
 
 
+def test_latest_run_id_on_uninitialised_db_returns_none():
+    """Fresh clone: a brand-new DB has no schema yet. latest_run_id must not raise (it gates
+    the dashboard auto-seed), it returns None so the caller seeds it."""
+    c = db.connect(":memory:")  # no init_schema
+    assert db.latest_run_id(c) is None
+
+
 def test_run_metadata_roundtrip(conn):
     db.insert_run(conn, run_id="r1", fecha="2026-06-20", concejo="Teverga",
                   coefficient_mode="ex_ante")

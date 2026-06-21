@@ -1,0 +1,4 @@
+# Dev/test only, NOT needed to run the app on Streamlit Cloud.
+-r requirements.txt
+pytest==9.1.1        # TDD
+playwright==1.60.0   # headless screenshot verification (scripts/shoot.py); run `playwright install chromium`

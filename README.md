@@ -9,7 +9,10 @@ energía solar entre vecinos y desplaza cargas flexibles a las horas de sol — 
 
 ## Estado
 
-Fase 0 — diseño aprobado, scaffolding hecho. Implementación (TDD) pendiente. Multi-sesión.
+MVP funcional, presentable. Slice vertical completo extremo a extremo (PVGIS → forecast →
+optimizador → SQLite → dashboard), 65 tests, dashboard verificado headless. Datos de consumo
+sintéticos (ilustrativos) hasta disponer de curvas reales de los vecinos. Despliegue público
+(Streamlit Cloud) pendiente de subir el repositorio a GitHub.
 
 ## Cómo funciona (MVP)
 
@@ -46,9 +49,23 @@ docs/              # spec de diseño + verificación legal 2026
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt        # solo runtime (app)
+streamlit run streamlit_app.py         # la base de datos se autogenera al primer arranque
+```
+
+Para desarrollo y tests:
+
+```bash
+pip install -r requirements-dev.txt
+playwright install chromium            # solo para la captura headless (scripts/shoot.py)
 pytest
 ```
+
+### Despliegue (Streamlit Community Cloud)
+
+`streamlit_app.py` es el punto de entrada. El repositorio no incluye base de datos
+(`.sqlite` está en `.gitignore` por privacidad); la app la regenera sola al cargar. Subir el
+repositorio a GitHub y apuntar Streamlit Cloud a `streamlit_app.py`.
 
 ## Contexto
 

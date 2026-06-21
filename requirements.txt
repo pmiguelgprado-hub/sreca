@@ -1,8 +1,8 @@
-# SRECA — stack coste-licencia 0 € (todo open source)
-streamlit       # dashboard
-requests        # cliente Open-Meteo (API gratuita)
-pyyaml          # config por-concejo
-pandas          # manejo de series horarias
-plotly          # gráficos dashboard
-pytest          # TDD
-# SQLite = stdlib (sqlite3), sin dependencia
+# SRECA runtime, stack coste-licencia 0 € (todo open source). Pinned to the tested set.
+# SQLite = stdlib (sqlite3), sin dependencia. Probado con Python 3.14.
+streamlit==1.58.0   # dashboard
+plotly==6.8.0       # gráficos
+pandas==3.0.3       # series horarias
+numpy==2.4.6        # (dep de pandas, fijado por reproducibilidad)
+pyyaml==6.0.3       # config por-concejo
+requests==2.34.2    # cliente Open-Meteo (Ruta B, forecast)
