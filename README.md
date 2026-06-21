@@ -7,10 +7,16 @@ energía solar entre vecinos y desplaza cargas flexibles a las horas de sol — 
 
 **Stack coste-licencia 0 €:** Python + Streamlit + Open-Meteo (API gratuita) + SQLite.
 
+## Vista
+
+![Panel SRECA: cifras anuales y cómo funciona el cerebro](docs/img/overview.png)
+
+![Un día medio: generación solar frente al consumo de cada vecino](docs/img/chart.png)
+
 ## Estado
 
 MVP funcional, presentable. Slice vertical completo extremo a extremo (PVGIS → forecast →
-optimizador → SQLite → dashboard), 65 tests, dashboard verificado headless. Datos de consumo
+optimizador → SQLite → dashboard), 73 tests, dashboard verificado headless. Datos de consumo
 sintéticos (ilustrativos) hasta disponer de curvas reales de los vecinos. Despliegue público
 (Streamlit Cloud) pendiente de subir el repositorio a GitHub.
 
