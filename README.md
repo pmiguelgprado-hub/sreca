@@ -63,9 +63,18 @@ pytest
 
 ### Despliegue (Streamlit Community Cloud)
 
-`streamlit_app.py` es el punto de entrada. El repositorio no incluye base de datos
-(`.sqlite` está en `.gitignore` por privacidad); la app la regenera sola al cargar. Subir el
-repositorio a GitHub y apuntar Streamlit Cloud a `streamlit_app.py`.
+Repositorio: <https://github.com/pmiguelgprado-hub/sreca> (público). `streamlit_app.py` es el
+punto de entrada. El repositorio no incluye base de datos (`.sqlite` está en `.gitignore` por
+privacidad); la app la regenera sola al cargar.
+
+Para publicar el enlace (un solo paso, requiere tu cuenta de GitHub):
+
+1. Entra en <https://share.streamlit.io> con GitHub.
+2. New app → repo `pmiguelgprado-hub/sreca`, rama `main`, archivo `streamlit_app.py`.
+   Enlace directo con el formulario relleno:
+   <https://share.streamlit.io/deploy?repository=pmiguelgprado-hub/sreca&branch=main&mainModule=streamlit_app.py>
+3. Deploy. Streamlit instala `requirements.txt` (rangos verificados en Python 3.13) y queda
+   una URL pública con datos sintéticos.
 
 ## Contexto
 
