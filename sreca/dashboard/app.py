@@ -285,6 +285,13 @@ def render(db_path: str = DEFAULT_DB, concejo: str = DEFAULT_CONCEJO) -> None:
             xaxis_title="Hora del día", yaxis_title="Coeficiente de reparto β",
             yaxis=dict(range=[0, 1], gridcolor="#ECE3D2", zeroline=False), height=360))
         st.plotly_chart(fig_b, width="stretch", config={"displayModeBar": False})
+        st.markdown(
+            '<p class="sreca-note">Al amanecer y al atardecer apenas hay sol para todos: en esas '
+            "horas el reparto da prioridad a los hogares más vulnerables (misión social), por eso "
+            "su coeficiente sube. Dentro de un mismo grupo de renta el reparto es proporcional al "
+            "consumo, no arbitrario.</p>",
+            unsafe_allow_html=True,
+        )
 
     # ---- Footer -------------------------------------------------------------
     st.markdown(

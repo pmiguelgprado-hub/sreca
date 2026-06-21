@@ -58,6 +58,29 @@ def test_equity_higher_priority_served_first_in_scarcity():
     assert alloc["mayor_b"] > alloc["granja"]
 
 
+def test_scarcity_intra_tier_is_proportional_not_id_order():
+    """Within one income tier, two households with equal priority and equal demand must get
+    equal allocation. The old code filled greedily by id, so the first id took everything and
+    the second got the remainder, which is arbitrary and unfair."""
+    gen = [5.0]
+    demand = {"granja": [4.0], "mayor_a": [4.0], "mayor_b": [4.0]}  # mayors share tier 3
+    beta = co.compute_coefficients(gen, demand, PRIORITY)
+    alloc = {p: beta[p][0] * gen[0] for p in demand}
+    assert alloc["mayor_a"] == pytest.approx(alloc["mayor_b"])   # fair within the tier
+    assert alloc["granja"] == pytest.approx(0.0)                 # lower-priority tier last
+
+
+def test_scarcity_partial_tier_splits_by_demand_share():
+    """A partially-covered tier splits the remaining generation in proportion to demand."""
+    gen = [6.0]
+    # both priority 3; mayor_a needs twice mayor_b → gets twice the share
+    demand = {"granja": [0.0], "mayor_a": [8.0], "mayor_b": [4.0]}
+    beta = co.compute_coefficients(gen, demand, {"granja": 1, "mayor_a": 3, "mayor_b": 3})
+    alloc = {p: beta[p][0] * gen[0] for p in demand}
+    assert alloc["mayor_a"] == pytest.approx(4.0)   # 6 * 8/12
+    assert alloc["mayor_b"] == pytest.approx(2.0)   # 6 * 4/12
+
+
 def test_energy_conservation():
     gen = [0.0, 5.0, 8.0, 20.0]
     demand = {

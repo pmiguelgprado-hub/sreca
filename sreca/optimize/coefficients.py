@@ -7,8 +7,10 @@ hour or a full 8760-h year — the per-hour rule is identical.
 Two regimes per hour:
   • surplus (gen ≥ Σ demand): cover every participant's demand, then split the leftover by
     equity weight (the leftover only earns excess compensation, so it goes to lower income).
-  • scarcity (gen < Σ demand): fill demand in priority order (lower income first) until the
-    generation is exhausted → all generation is self-consumed; equity breaks the tie.
+  • scarcity (gen < Σ demand): fill demand tier by tier (lower income first) until the
+    generation is exhausted → all generation is self-consumed. A tier that cannot be fully
+    covered splits the remaining generation proportional to demand (fair within the tier, not
+    by arbitrary id order).
 
 Self-consumption is min(allocated, demand); anything allocated beyond demand is grid excess.
 """
@@ -40,15 +42,26 @@ def _allocate_hour(gen_h: float, demand_h: dict[str, float], priority: dict[str,
         leftover = gen_h - total_demand
         allocated = {p: demand_h[p] + leftover * weights[p] for p in demand_h}
     else:
-        # scarcity: fill by priority (higher renta_priority first), then by id for determinism
-        order = sorted(demand_h, key=lambda p: (-priority[p], p))
+        # scarcity: fill tier by tier (higher renta_priority = lower income first). Within a
+        # tier that the remaining generation can't fully cover, split proportional to demand.
         allocated = {p: 0.0 for p in demand_h}
         remaining = gen_h
-        for p in order:
-            take = min(demand_h[p], remaining)
-            allocated[p] = take
-            remaining -= take
-            if remaining <= _EPS:
+        tiers: dict[int, list[str]] = {}
+        for p in demand_h:
+            tiers.setdefault(priority[p], []).append(p)
+        for prio in sorted(tiers, reverse=True):
+            members = tiers[prio]
+            tier_demand = sum(demand_h[p] for p in members)
+            if tier_demand <= _EPS:
+                continue
+            if remaining >= tier_demand - _EPS:
+                for p in members:
+                    allocated[p] = demand_h[p]
+                remaining -= tier_demand
+            else:
+                for p in members:
+                    allocated[p] = remaining * demand_h[p] / tier_demand
+                remaining = 0.0
                 break
 
     return {p: allocated[p] / gen_h for p in demand_h}
