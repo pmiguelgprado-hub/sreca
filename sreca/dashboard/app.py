@@ -57,16 +57,18 @@ _CSS = """
 """
 
 
-def _ensure_seeded(db_path: str, concejo: str) -> None:
-    """Auto-seed the DB on a fresh clone so the app renders with no manual step (cloud-ready)."""
+def _ensure_seeded(db_path: str, concejos: list[str]) -> None:
+    """Auto-seed each concejo on a fresh clone so the app renders with no manual step (cloud-ready)."""
+    from sreca import main
+    from sreca.concejo import load_concejo
     from sreca.store import db
 
-    if db.latest_run_id(db.connect(db_path)) is not None:
-        return
-    from sreca import main
-
     Path(db_path).parent.mkdir(parents=True, exist_ok=True)
-    main.run_rebalance(concejo, db_path)
+    conn = db.connect(db_path)
+    for stem in concejos:
+        display = load_concejo(stem).concejo
+        if db.latest_run_id(conn, display) is None:
+            main.run_rebalance(stem, db_path)
 
 
 # Spanish orthography fixups for display ids (token-level, config-agnostic, not per-concejo).
@@ -104,14 +106,27 @@ def render(db_path: str = DEFAULT_DB, concejo: str = DEFAULT_CONCEJO) -> None:
     import plotly.graph_objects as go
     import streamlit as st
 
+    from sreca.concejo import available_concejos, load_concejo
     from sreca.dashboard.data import load_dashboard_data
 
     st.set_page_config(page_title="SRECA, Comunidad Energética Local", page_icon="☀️",
                        layout="wide")
     st.markdown(_CSS, unsafe_allow_html=True)
 
-    _ensure_seeded(db_path, concejo)
-    d = load_dashboard_data(db_path)
+    stems = available_concejos() or [concejo]
+    _ensure_seeded(db_path, stems)
+
+    # Concejo picker (replicability is real: same software, each concejo's own config + climate).
+    display_to_stem = {load_concejo(s).concejo: s for s in stems}
+    displays = sorted(display_to_stem)
+    default_display = next((d for d in displays if display_to_stem[d] == concejo), displays[0])
+    chosen = st.sidebar.selectbox("Concejo", displays, index=displays.index(default_display))
+    stem = display_to_stem[chosen]
+    cfg = load_concejo(stem)
+    st.sidebar.caption("Mismo cerebro, otro concejo: solo cambian la configuración y los "
+                       "datos de recurso solar (PVGIS).")
+
+    d = load_dashboard_data(db_path, concejo=chosen)
     if d is None:
         st.error("No se pudo generar el run inicial. Revisa la configuración del concejo.")
         return
@@ -136,16 +151,17 @@ def render(db_path: str = DEFAULT_DB, concejo: str = DEFAULT_CONCEJO) -> None:
         "no es generar: es repartir bien esa energía y consumirla cuando hay sol. De eso se "
         "ocupa SRECA."
     )
-    st.markdown(
-        """
-        <div class="sreca-facts">
-          <div class="f"><div class="n">1.495</div><div class="l">habitantes en Teverga (INE 2025)</div></div>
-          <div class="f"><div class="n">15,9 %</div><div class="l">hogares asturianos en riesgo de pobreza energética (AROPE 2025)</div></div>
-          <div class="f"><div class="n">0 €</div><div class="l">en licencias de software (Python, Streamlit, Open-Meteo, PVGIS)</div></div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    facts = []
+    if cfg.population:
+        pop = f"{cfg.population:,}".replace(",", ".")
+        yr = f" (INE {cfg.population_year})" if cfg.population_year else ""
+        facts.append(f'<div class="f"><div class="n">{pop}</div>'
+                     f'<div class="l">habitantes en {cfg.concejo}{yr}</div></div>')
+    facts.append('<div class="f"><div class="n">15,9 %</div><div class="l">hogares asturianos en '
+                 'riesgo de pobreza energética (AROPE 2025)</div></div>')
+    facts.append('<div class="f"><div class="n">0 €</div><div class="l">en licencias de software '
+                 '(Python, Streamlit, Open-Meteo, PVGIS)</div></div>')
+    st.markdown(f'<div class="sreca-facts">{"".join(facts)}</div>', unsafe_allow_html=True)
 
     # ---- Annual headline (honest, 8760h chain) ------------------------------
     st.markdown('<h2 class="sreca-sec">Lo que consigue la comunidad en un año</h2>',

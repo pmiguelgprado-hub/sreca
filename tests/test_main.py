@@ -48,3 +48,17 @@ def test_run_rebalance_records_ex_ante_mode(tmp_path):
     run = next(r for r in db.read_runs(conn) if r["run_id"] == run_id)
     assert run["coefficient_mode"] == "ex_ante"
     assert run["concejo"] == "Teverga"
+
+
+def test_run_rebalance_replicates_to_second_concejo(tmp_path):
+    """Replicability (spec §9.4): a second concejo runs end-to-end on its own committed
+    climatology, no code change and no climatology_path argument."""
+    db_path = str(tmp_path / "sreca.sqlite")
+    run_id = main.run_rebalance("somiedo", db_path)
+    conn = db.connect(db_path)
+    run = next(r for r in db.read_runs(conn) if r["run_id"] == run_id)
+    assert run["concejo"] == "Somiedo"
+    gen = db.read_pv_forecast(conn, run_id)
+    assert len(gen) == 24 and sum(gen) > 0
+    pids = {p.id for p in load_concejo("somiedo").participants}
+    assert set(db.read_savings(conn, run_id)) == pids

@@ -20,16 +20,13 @@ from pathlib import Path
 import pandas as pd
 
 from sreca.concejo import PV, Site, load_concejo
+from sreca.datasets import climatology_path as _climatology_path
 from sreca.forecast import pv as pv_mod
 from sreca.forecast.demand import daily_demand
 from sreca.optimize.coefficients import compute_coefficients
 from sreca.optimize.savings import compute_savings
 from sreca.optimize.schedule import build_ex_ante_schedule
 from sreca.store import db
-
-_DEFAULT_CLIMATOLOGY = (
-    Path(__file__).resolve().parent.parent / "tests" / "fixtures" / "teverga_climatology_hourly.csv"
-)
 
 
 def mean_generation_daytype(climatology: pd.DataFrame, site: Site, pv: PV) -> list[float]:
@@ -42,17 +39,20 @@ def mean_generation_daytype(climatology: pd.DataFrame, site: Site, pv: PV) -> li
 def run_rebalance(
     concejo: str,
     db_path: str,
-    climatology_path: str | Path = _DEFAULT_CLIMATOLOGY,
+    climatology_path: str | Path | None = None,
     run_id: str | None = None,
 ) -> str:
-    """Run the slice for ``concejo`` and persist one ex-ante run to ``db_path``. Returns run_id."""
+    """Run the slice for ``concejo`` and persist one ex-ante run to ``db_path``. Returns run_id.
+
+    Climatology defaults to the concejo's own committed PVGIS-TMY fixture (per-concejo).
+    """
     cfg = load_concejo(concejo)
     if cfg.legal.coefficient_mode != "ex_ante":
         raise NotImplementedError(
             f"coefficient_mode '{cfg.legal.coefficient_mode}' is gated (ex_post_dynamic)"
         )
 
-    climatology = pd.read_csv(climatology_path)
+    climatology = pd.read_csv(climatology_path or _climatology_path(concejo))
     gen = mean_generation_daytype(climatology, cfg.site, cfg.pv)
     demand = {p.id: daily_demand(p.profile, p.daily_kwh) for p in cfg.participants}
     priority = {p.id: p.renta_priority for p in cfg.participants}

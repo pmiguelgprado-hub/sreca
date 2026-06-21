@@ -78,6 +78,23 @@ def test_dashboard_data_includes_honest_annual_headline(tmp_path):
     assert d.annual.self_consumption_rate <= daytype_rate + 1e-9
 
 
+def test_load_dashboard_data_selects_by_concejo(tmp_path):
+    """With several concejos seeded, the picker loads the chosen one (replicability)."""
+    db_path = str(tmp_path / "sreca.sqlite")
+    main.run_rebalance("teverga", db_path)
+    main.run_rebalance("somiedo", db_path)   # latest globally = Somiedo
+
+    teverga = data.load_dashboard_data(db_path, concejo="Teverga")
+    somiedo = data.load_dashboard_data(db_path, concejo="Somiedo")
+    assert teverga.concejo == "Teverga"
+    assert somiedo.concejo == "Somiedo"
+    # each carries its own honest annual headline, from its own climatology
+    assert teverga.annual is not None and somiedo.annual is not None
+    assert teverga.annual.gen_kwh != somiedo.annual.gen_kwh
+    # no concejo arg → global latest (Somiedo, inserted last)
+    assert data.load_dashboard_data(db_path).concejo == "Somiedo"
+
+
 def test_load_dashboard_data_empty_db_returns_none(tmp_path):
     db_path = str(tmp_path / "empty.sqlite")
     conn = db.connect(db_path)

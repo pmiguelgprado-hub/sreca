@@ -1,7 +1,7 @@
 """Tests for config loader (sreca.concejo) — per-concejo config drives everything (spec §8, §9.4)."""
 import pytest
 
-from sreca.concejo import load_concejo, ConcejoConfig
+from sreca.concejo import available_concejos, load_concejo, ConcejoConfig
 
 
 def test_loads_teverga_site_and_pv():
@@ -52,3 +52,17 @@ def test_coefficient_mode_must_be_legal_value():
 def test_unknown_concejo_raises():
     with pytest.raises(FileNotFoundError):
         load_concejo("atlantida")
+
+
+def test_available_concejos_lists_configured():
+    concejos = available_concejos()
+    assert "teverga" in concejos
+    assert "somiedo" in concejos          # replicability: a second concejo exists
+    assert concejos == sorted(concejos)
+
+
+def test_population_optional_per_concejo():
+    # Teverga has a verified figure; Somiedo deliberately omits it (no fabricated public number).
+    assert load_concejo("teverga").population == 1495
+    assert load_concejo("teverga").population_year == 2025
+    assert load_concejo("somiedo").population is None

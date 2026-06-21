@@ -1,4 +1,4 @@
-"""Build the Teverga climatological-year irradiance fixture (one-time, network).
+"""Build a concejo's climatological-year irradiance fixture (one-time, network).
 
 Route A (ex-ante annual profile) source = **PVGIS TMY** (decision 2026-06-20):
 SARAH2 satellite irradiance + DEM horizon shading, window 2005–2020, also 0 €/no key.
@@ -7,10 +7,11 @@ then measures the MODEL against same-source PVGIS, not a source discrepancy.
 
 (Route B — D+1 forecast — uses Open-Meteo, a separate ingest path; PVGIS has no forecast.)
 
-Writes an 8760-row standard year to tests/fixtures/teverga_climatology_hourly.csv.
-The committed CSV is what tests mock against (spec §10: no network in tests).
+Reads lat/lon from the concejo config and writes an 8760-row standard year to
+tests/fixtures/<concejo>_climatology_hourly.csv. The committed CSV is what tests mock against
+(spec §10: no network in tests). Replicating to a new concejo = add its YAML, run this once.
 
-Usage:  python scripts/build_climatology_fixture.py
+Usage:  python scripts/build_climatology_fixture.py [concejo]   (default: teverga)
 """
 from __future__ import annotations
 
@@ -19,15 +20,22 @@ from pathlib import Path
 
 import requests
 
-LAT, LON = 43.16, -6.09
-OUT = Path(__file__).resolve().parent.parent / "tests" / "fixtures" / "teverga_climatology_hourly.csv"
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from sreca.concejo import load_concejo  # noqa: E402
+from sreca.datasets import climatology_path  # noqa: E402
 
 
 def main() -> int:
-    print("fetching PVGIS TMY (SARAH2 + horizon) ...", file=sys.stderr)
+    concejo = sys.argv[1] if len(sys.argv) > 1 else "teverga"
+    cfg = load_concejo(concejo)
+    out = climatology_path(concejo)
+
+    print(f"fetching PVGIS TMY (SARAH2 + horizon) for {cfg.concejo} "
+          f"({cfg.site.lat}, {cfg.site.lon}) ...", file=sys.stderr)
     r = requests.get(
         "https://re.jrc.ec.europa.eu/api/v5_2/tmy",
-        params={"lat": LAT, "lon": LON, "usehorizon": 1, "outputformat": "json"},
+        params={"lat": cfg.site.lat, "lon": cfg.site.lon, "usehorizon": 1,
+                "outputformat": "json"},
         timeout=120,
     )
     r.raise_for_status()
@@ -43,9 +51,9 @@ def main() -> int:
         annual_ghi += ghi              # W/m² × 1h = Wh/m²
         rows.append(f"{month},{day},{hour},{ghi:.2f},{dni:.2f},{dhi:.2f},{temp:.2f}")
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text("month,day,hour,ghi_wm2,dni_wm2,dhi_wm2,temp_c\n" + "\n".join(rows) + "\n")
-    print(f"wrote {OUT} ({len(rows)} rows)", file=sys.stderr)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("month,day,hour,ghi_wm2,dni_wm2,dhi_wm2,temp_c\n" + "\n".join(rows) + "\n")
+    print(f"wrote {out} ({len(rows)} rows)", file=sys.stderr)
     print(f"sanity: annual GHI on horizontal = {annual_ghi/1000:.0f} kWh/m²/yr", file=sys.stderr)
     return 0
 

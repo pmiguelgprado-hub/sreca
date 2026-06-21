@@ -119,16 +119,23 @@ def read_runs(conn) -> list[dict]:
     return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
-def latest_run_id(conn) -> str | None:
+def latest_run_id(conn, concejo: str | None = None) -> str | None:
     """run_id of the most recently inserted run (by rowid), or None if empty/uninitialised.
 
-    Tolerates a brand-new DB with no schema yet (fresh clone): returns None so callers can
-    seed it, rather than raising ``no such table``.
+    If ``concejo`` (display name as stored) is given, restrict to that concejo's runs. Tolerates a
+    brand-new DB with no schema yet (fresh clone): returns None so callers can seed it, rather
+    than raising ``no such table``.
     """
     try:
-        row = conn.execute(
-            "SELECT run_id FROM forecast_runs ORDER BY rowid DESC LIMIT 1"
-        ).fetchone()
+        if concejo is None:
+            row = conn.execute(
+                "SELECT run_id FROM forecast_runs ORDER BY rowid DESC LIMIT 1"
+            ).fetchone()
+        else:
+            row = conn.execute(
+                "SELECT run_id FROM forecast_runs WHERE concejo=? ORDER BY rowid DESC LIMIT 1",
+                (concejo,),
+            ).fetchone()
     except sqlite3.OperationalError:
         return None
     return row[0] if row else None

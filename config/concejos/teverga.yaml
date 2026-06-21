@@ -1,6 +1,8 @@
 # SRECA — config del concejo piloto. Replicar = añadir otro YAML, sin tocar código.
 # Cifras FV verificadas vía PVGIS (JRC, datos 2005-2020). Ver docs/2026-06-19-legal-verification-2026.md
 concejo: Teverga
+population: 1495        # habitantes (INE 2025)
+population_year: 2025
 
 # --- Recurso / planta FV ---
 site:

@@ -28,6 +28,17 @@ def test_latest_run_id_on_uninitialised_db_returns_none():
     assert db.latest_run_id(c) is None
 
 
+def test_latest_run_id_filters_by_concejo(conn):
+    db.insert_run(conn, run_id="t1", fecha="2026-06-21", concejo="Teverga",
+                  coefficient_mode="ex_ante")
+    db.insert_run(conn, run_id="s1", fecha="2026-06-21", concejo="Somiedo",
+                  coefficient_mode="ex_ante")
+    assert db.latest_run_id(conn) == "s1"                       # global latest
+    assert db.latest_run_id(conn, "Teverga") == "t1"           # filtered
+    assert db.latest_run_id(conn, "Somiedo") == "s1"
+    assert db.latest_run_id(conn, "Quirós") is None            # no run for that concejo
+
+
 def test_run_metadata_roundtrip(conn):
     db.insert_run(conn, run_id="r1", fecha="2026-06-20", concejo="Teverga",
                   coefficient_mode="ex_ante")

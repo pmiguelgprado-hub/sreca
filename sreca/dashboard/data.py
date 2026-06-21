@@ -7,17 +7,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
 
 import pandas as pd
 
 from sreca.concejo import load_concejo
+from sreca.datasets import climatology_path
 from sreca.optimize.load_shift import recommend_flexible_load_shift
 from sreca.report import AnnualSummary, annual_summary
 from sreca.store import db
-
-# Same climatology source main.py runs the year on (PVGIS TMY, committed). Single source of truth.
-_CLIMATOLOGY = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "teverga_climatology_hourly.csv"
 
 
 @dataclass(frozen=True)
@@ -69,28 +66,31 @@ def _load_shift_recommendation(concejo: str, gen: list[float]) -> dict[str, list
     return recommend_flexible_load_shift(flex, gen)
 
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=16)
 def _annual_headline(concejo: str) -> AnnualSummary | None:
-    """Honest full-year figures (8760h chain), memoised per process.
+    """Honest full-year figures (8760h chain) for a concejo, memoised per process.
 
     The 8760h solar-position loop is the one heavy computation here. Streamlit reruns the script
     on every interaction (e.g. the month selectbox), so without this cache each rerun would
-    recompute the whole year. The climatology fixture is static, so per-process memoisation by
-    concejo is safe and correct. NOTE: the climatology source is currently Teverga-specific
-    (_CLIMATOLOGY); a second concejo needs its own resource-data fixture (fase 2)."""
+    recompute the whole year. Each concejo has its own committed climatology fixture (static),
+    so per-process memoisation by concejo is safe and correct."""
     try:
         cfg = load_concejo(concejo.lower())
     except FileNotFoundError:
         return None
-    if not _CLIMATOLOGY.exists():
+    clim = climatology_path(concejo)
+    if not clim.exists():
         return None
-    return annual_summary(cfg, pd.read_csv(_CLIMATOLOGY))
+    return annual_summary(cfg, pd.read_csv(clim))
 
 
-def load_dashboard_data(db_path: str) -> DashboardData | None:
-    """Load the most recent run, or None if the database has no runs."""
+def load_dashboard_data(db_path: str, concejo: str | None = None) -> DashboardData | None:
+    """Load the latest run, or the latest run for ``concejo`` (display name) if given.
+
+    Returns None if there is no matching run.
+    """
     conn = db.connect(db_path)
-    run_id = db.latest_run_id(conn)
+    run_id = db.latest_run_id(conn, concejo)
     if run_id is None:
         return None
     run = next(r for r in db.read_runs(conn) if r["run_id"] == run_id)

@@ -61,6 +61,14 @@ class ConcejoConfig:
     prices: Prices
     legal: Legal
     participants: list[Participant]
+    population: int | None = None        # habitantes (per-concejo, opcional)
+    population_year: int | None = None   # año del dato de población
+
+
+def available_concejos(config_dir: Path | None = None) -> list[str]:
+    """Config stems available under config/concejos/ (e.g. ['somiedo', 'teverga'])."""
+    base = config_dir or _CONFIG_DIR
+    return sorted(p.stem for p in base.glob("*.yaml"))
 
 
 def load_concejo(name: str, config_dir: Path | None = None) -> ConcejoConfig:
@@ -99,4 +107,6 @@ def load_concejo(name: str, config_dir: Path | None = None) -> ConcejoConfig:
         prices=Prices(**raw["prices"]),
         legal=legal,
         participants=participants,
+        population=raw.get("population"),
+        population_year=raw.get("population_year"),
     )
