@@ -103,7 +103,7 @@ def test_territory_context_marks_reto_demografico():
     t = data.territory_context(load_concejo("teverga"))
     assert t.population == 1495
     assert t.population_year == 2025
-    assert t.density_hab_km2 == pytest.approx(1495 / 168.71, abs=0.01)
+    assert t.density_hab_km2 == pytest.approx(1495 / 168.86, abs=0.01)
     assert t.is_reto_demografico is True
 
     s = data.territory_context(load_concejo("somiedo"))

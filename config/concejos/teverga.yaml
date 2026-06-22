@@ -3,7 +3,7 @@
 concejo: Teverga
 population: 1495        # habitantes (INE, padrón 1-ene-2025; verificado en fuente, tempus API tabla 2886).
 population_year: 2025  # 2024 fueron 1539 → -2,9 % en un año. Ver docs/2026-06-22-official-data-sources.md
-area_km2: 168.71       # superficie oficial → densidad ≈ 8,9 hab/km² (España vaciada)
+area_km2: 168.86       # superficie oficial (IGN/INE, vía ficha Teverga) → densidad ≈ 8,9 hab/km²
 
 # --- Recurso / planta FV ---
 site:

@@ -75,9 +75,9 @@ def test_area_and_density_per_concejo():
     # area_km2 is the official surface; density is derived (pop/area), not a duplicated figure.
     teverga = load_concejo("teverga")
     somiedo = load_concejo("somiedo")
-    assert teverga.area_km2 == 168.71
+    assert teverga.area_km2 == 168.86
     assert somiedo.area_km2 == 291.38
-    assert teverga.density_hab_km2 == pytest.approx(1495 / 168.71, abs=0.01)
+    assert teverga.density_hab_km2 == pytest.approx(1495 / 168.86, abs=0.01)
     assert somiedo.density_hab_km2 == pytest.approx(1031 / 291.38, abs=0.01)
 
 

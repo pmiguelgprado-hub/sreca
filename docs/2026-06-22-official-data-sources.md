@@ -24,11 +24,12 @@ GET https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/2886?nult=2&det=2
 
 | Concejo | Población 2025 | Población 2024 | Δ interanual | Superficie | Densidad |
 |---|---|---|---|---|---|
-| **Teverga** | **1.495** | 1.539 | −2,9 % | 168,71 km² | ≈ 8,9 hab/km² |
+| **Teverga** | **1.495** | 1.539 | −2,9 % | 168,86 km² | ≈ 8,9 hab/km² |
 | **Somiedo** | **1.031** | 1.065 | −3,2 % | 291,38 km² | ≈ 3,5 hab/km² |
 
 Contexto de despoblación (refuerza la tesis, no entra en la app como serie): Somiedo registraba
-5.558 hab en 1940 → −70 % en 85 años; es el 2.º concejo de menor densidad de Asturias. Ambos
+5.558 hab en 1940 → −81 % en 85 años (5.558 → 1.031); es el 2.º concejo de menor densidad de
+Asturias. Ambos
 concejos están **muy por debajo de 5.000 hab** → banda de *municipios de reto demográfico* que
 es justo el objetivo de CE IMPLEMENTA (IDAE) y del "impulso demográfico" de Caja Rural.
 
