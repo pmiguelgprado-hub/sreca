@@ -63,6 +63,15 @@ class ConcejoConfig:
     participants: list[Participant]
     population: int | None = None        # habitantes (per-concejo, opcional)
     population_year: int | None = None   # año del dato de población
+    area_km2: float | None = None        # superficie oficial del concejo (km²)
+
+    @property
+    def density_hab_km2(self) -> float | None:
+        """Densidad derivada (pob/superficie). None si falta cualquiera de los dos —
+        nunca se inventa el denominador."""
+        if self.population is None or self.area_km2 is None:
+            return None
+        return self.population / self.area_km2
 
 
 def available_concejos(config_dir: Path | None = None) -> list[str]:
@@ -109,4 +118,5 @@ def load_concejo(name: str, config_dir: Path | None = None) -> ConcejoConfig:
         participants=participants,
         population=raw.get("population"),
         population_year=raw.get("population_year"),
+        area_km2=raw.get("area_km2"),
     )

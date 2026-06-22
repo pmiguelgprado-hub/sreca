@@ -49,4 +49,5 @@ Excelencia de la Fundación Caja Rural de Asturias**.
 
 - Spec de diseño MVP: `docs/2026-06-19-sreca-mvp-design.md`
 - Verificación legal 2026: `docs/2026-06-19-legal-verification-2026.md`
+- Fuentes de datos oficiales (INE en fuente, PVPC 2026, encaje Caja Rural): `docs/2026-06-22-official-data-sources.md`
 - Memoria de beca e investigación de partida: documento interno (no incluido en el repo).

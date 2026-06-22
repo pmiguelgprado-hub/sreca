@@ -2,8 +2,9 @@
 # Somiedo: concejo de montaña, Reserva de la Biosfera, ganadería de vacuno → encaja con la
 # sinergia (granjas lácteas + hogares). Recurso solar propio (PVGIS TMY, fixture aparte).
 concejo: Somiedo
-
-# Población: no incluida hasta confirmar cifra oficial INE (no se inventa un dato público).
+population: 1031        # habitantes (INE, padrón 1-ene-2025; verificado en fuente, tempus API tabla 2886).
+population_year: 2025  # 2024 fueron 1065 → -3,2 % en un año; 2º concejo de menor densidad de Asturias.
+area_km2: 291.38       # superficie oficial → densidad ≈ 3,5 hab/km². Ver docs/2026-06-22-official-data-sources.md
 
 # --- Recurso / planta FV ---
 site:
@@ -17,7 +18,7 @@ pv:
   noct_c: 45
   gamma_pmp_per_c: -0.0035
 
-# --- Económico ---
+# --- Económico (PVPC 2026, conservadores anti-overclaim; ver teverga.yaml / data-sources doc) ---
 prices:
   retail_eur_kwh: 0.20
   compensation_eur_kwh: 0.06

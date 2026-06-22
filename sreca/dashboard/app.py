@@ -107,7 +107,7 @@ def render(db_path: str = DEFAULT_DB, concejo: str = DEFAULT_CONCEJO) -> None:
     import streamlit as st
 
     from sreca.concejo import available_concejos, load_concejo
-    from sreca.dashboard.data import load_dashboard_data
+    from sreca.dashboard.data import load_dashboard_data, territory_context
 
     st.set_page_config(page_title="SRECA, Comunidad Energética Local", page_icon="☀️",
                        layout="wide")
@@ -151,12 +151,18 @@ def render(db_path: str = DEFAULT_DB, concejo: str = DEFAULT_CONCEJO) -> None:
         "no es generar: es repartir bien esa energía y consumirla cuando hay sol. De eso se "
         "ocupa SRECA."
     )
+    t = territory_context(cfg)
     facts = []
-    if cfg.population:
-        pop = f"{cfg.population:,}".replace(",", ".")
-        yr = f" (INE {cfg.population_year})" if cfg.population_year else ""
+    if t.population:
+        pop = f"{t.population:,}".replace(",", ".")
+        yr = f" (INE {t.population_year})" if t.population_year else ""
+        tag = " · municipio de reto demográfico" if t.is_reto_demografico else ""
         facts.append(f'<div class="f"><div class="n">{pop}</div>'
-                     f'<div class="l">habitantes en {cfg.concejo}{yr}</div></div>')
+                     f'<div class="l">habitantes en {cfg.concejo}{yr}{tag}</div></div>')
+    if t.density_hab_km2 is not None:
+        dens = f"{t.density_hab_km2:.1f}".replace(".", ",")
+        facts.append(f'<div class="f"><div class="n">{dens}</div>'
+                     f'<div class="l">hab/km² — densidad de la España vaciada</div></div>')
     facts.append('<div class="f"><div class="n">15,9 %</div><div class="l">hogares asturianos en '
                  'riesgo de pobreza energética (AROPE 2025)</div></div>')
     facts.append('<div class="f"><div class="n">0 €</div><div class="l">en licencias de software '

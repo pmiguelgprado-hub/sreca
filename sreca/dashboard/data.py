@@ -10,7 +10,7 @@ from functools import lru_cache
 
 import pandas as pd
 
-from sreca.concejo import load_concejo
+from sreca.concejo import ConcejoConfig, load_concejo
 from sreca.datasets import climatology_path
 from sreca.optimize.load_shift import recommend_flexible_load_shift
 from sreca.report import AnnualSummary, annual_summary
@@ -37,6 +37,38 @@ class CommunityKPIs:
     savings_eur: float             # total community savings (€)
     self_consumption_rate: float   # Σ self_consumed / Σ generation (0..1)
     demand_coverage: float         # Σ self_consumed / Σ demand (0..1)
+
+
+# CE IMPLEMENTA / RDL 7/2026 target band: municipios de reto demográfico (< 5.000 hab).
+# It is the public funding rationale this project addresses (see docs/2026-06-22-official-data-sources.md).
+RETO_DEMOGRAFICO_MAX_HAB = 5000
+
+
+@dataclass(frozen=True)
+class TerritoryContext:
+    concejo: str
+    population: int | None
+    population_year: int | None
+    area_km2: float | None
+    density_hab_km2: float | None
+    is_reto_demografico: bool       # municipio < 5.000 hab (CE IMPLEMENTA / reto demográfico)
+
+
+def territory_context(cfg: ConcejoConfig) -> TerritoryContext:
+    """Demographic framing for a concejo, straight from its config (pure, no DB).
+
+    Ties the app to its funding rationale: the pilot concejos are small, low-density
+    municipios de reto demográfico. Density is derived in the config; never fabricated here.
+    """
+    pop = cfg.population
+    return TerritoryContext(
+        concejo=cfg.concejo,
+        population=pop,
+        population_year=cfg.population_year,
+        area_km2=cfg.area_km2,
+        density_hab_km2=cfg.density_hab_km2,
+        is_reto_demografico=(pop is not None and pop < RETO_DEMOGRAFICO_MAX_HAB),
+    )
 
 
 def community_kpis(d: DashboardData) -> CommunityKPIs:

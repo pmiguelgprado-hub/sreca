@@ -16,9 +16,11 @@ energía solar entre vecinos y desplaza cargas flexibles a las horas de sol — 
 ## Estado
 
 MVP funcional, presentable. Slice vertical completo extremo a extremo (PVGIS → forecast →
-optimizador → SQLite → dashboard), 73 tests, dashboard verificado headless. Datos de consumo
-sintéticos (ilustrativos) hasta disponer de curvas reales de los vecinos. Despliegue público
-(Streamlit Cloud) pendiente de subir el repositorio a GitHub.
+optimizador → SQLite → dashboard), 76 tests, dashboard verificado headless. Demografía de los
+concejos verificada en fuente (INE, padrón 2025) y precios PVPC 2026 conservadores — ver
+`docs/2026-06-22-official-data-sources.md`. Datos de consumo sintéticos (ilustrativos) hasta
+disponer de curvas reales de los vecinos. Despliegue público (Streamlit Cloud) pendiente de
+configurar la app en share.streamlit.io.
 
 ## Cómo funciona (MVP)
 
@@ -49,6 +51,7 @@ docs/              # spec de diseño + verificación legal 2026
 
 - Spec de diseño: `docs/2026-06-19-sreca-mvp-design.md`
 - Verificación legal 2026: `docs/2026-06-19-legal-verification-2026.md`
+- Fuentes de datos oficiales (INE, PVPC, Caja Rural): `docs/2026-06-22-official-data-sources.md`
 - Memoria de beca e investigación de partida: documento interno (no incluido en el repo).
 
 ## Setup

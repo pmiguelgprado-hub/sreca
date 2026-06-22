@@ -61,8 +61,37 @@ def test_available_concejos_lists_configured():
     assert concejos == sorted(concejos)
 
 
-def test_population_optional_per_concejo():
-    # Teverga has a verified figure; Somiedo deliberately omits it (no fabricated public number).
-    assert load_concejo("teverga").population == 1495
-    assert load_concejo("teverga").population_year == 2025
-    assert load_concejo("somiedo").population is None
+def test_population_verified_at_source_per_concejo():
+    # Both figures verified at the INE source (tempus API, table 2886, padrón 1-ene-2025).
+    # The invariant is "no fabricated public number", not "Somiedo stays blank": once the
+    # official figure is confirmed at source it is filled in.
+    teverga = load_concejo("teverga")
+    somiedo = load_concejo("somiedo")
+    assert teverga.population == 1495 and teverga.population_year == 2025
+    assert somiedo.population == 1031 and somiedo.population_year == 2025
+
+
+def test_area_and_density_per_concejo():
+    # area_km2 is the official surface; density is derived (pop/area), not a duplicated figure.
+    teverga = load_concejo("teverga")
+    somiedo = load_concejo("somiedo")
+    assert teverga.area_km2 == 168.71
+    assert somiedo.area_km2 == 291.38
+    assert teverga.density_hab_km2 == pytest.approx(1495 / 168.71, abs=0.01)
+    assert somiedo.density_hab_km2 == pytest.approx(1031 / 291.38, abs=0.01)
+
+
+def test_density_none_when_area_or_population_missing(tmp_path):
+    # No area or no population → no density (never invent the denominator).
+    (tmp_path / "x.yaml").write_text(
+        "concejo: X\n"
+        "site: {lat: 43.0, lon: -6.0, tilt_deg: 35, azimuth_deg: 180}\n"
+        "pv: {kwp: 15, system_losses: 0.14, noct_c: 45, gamma_pmp_per_c: -0.0035}\n"
+        "prices: {retail_eur_kwh: 0.20, compensation_eur_kwh: 0.06}\n"
+        "legal: {proximidad_max_m: 5000, coefficient_mode: ex_ante}\n"
+        "participants: [{id: a, profile: residencial_mayor_diurno, renta_priority: 3, daily_kwh: 8.0}]\n"
+    )
+    cfg = load_concejo("x", config_dir=tmp_path)
+    assert cfg.area_km2 is None
+    assert cfg.population is None
+    assert cfg.density_hab_km2 is None

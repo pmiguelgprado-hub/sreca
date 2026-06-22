@@ -95,6 +95,23 @@ def test_load_dashboard_data_selects_by_concejo(tmp_path):
     assert data.load_dashboard_data(db_path).concejo == "Somiedo"
 
 
+def test_territory_context_marks_reto_demografico():
+    # The thesis made visible: both pilot concejos are < 5.000 hab (CE IMPLEMENTA / reto
+    # demográfico target) and below the rural-density line — pure function, no DB needed.
+    from sreca.concejo import load_concejo
+
+    t = data.territory_context(load_concejo("teverga"))
+    assert t.population == 1495
+    assert t.population_year == 2025
+    assert t.density_hab_km2 == pytest.approx(1495 / 168.71, abs=0.01)
+    assert t.is_reto_demografico is True
+
+    s = data.territory_context(load_concejo("somiedo"))
+    assert s.population == 1031
+    assert s.density_hab_km2 == pytest.approx(1031 / 291.38, abs=0.01)
+    assert s.is_reto_demografico is True
+
+
 def test_load_dashboard_data_empty_db_returns_none(tmp_path):
     db_path = str(tmp_path / "empty.sqlite")
     conn = db.connect(db_path)

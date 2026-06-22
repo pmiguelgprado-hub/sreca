@@ -1,8 +1,9 @@
 # SRECA — config del concejo piloto. Replicar = añadir otro YAML, sin tocar código.
 # Cifras FV verificadas vía PVGIS (JRC, datos 2005-2020). Ver docs/2026-06-19-legal-verification-2026.md
 concejo: Teverga
-population: 1495        # habitantes (INE 2025)
-population_year: 2025
+population: 1495        # habitantes (INE, padrón 1-ene-2025; verificado en fuente, tempus API tabla 2886).
+population_year: 2025  # 2024 fueron 1539 → -2,9 % en un año. Ver docs/2026-06-22-official-data-sources.md
+area_km2: 168.71       # superficie oficial → densidad ≈ 8,9 hab/km² (España vaciada)
 
 # --- Recurso / planta FV ---
 site:
@@ -18,10 +19,14 @@ pv:
 # Sanity esperado (PVGIS 2026-06-20): ~17376 kWh/año, yield ~1158 kWh/kWp, PR ~0.795
 # (calibración test integración; Ruta A = PVGIS TMY SARAH2+horizonte, ver docs/2026-06-20-calibration-source-discrepancy.md)
 
-# --- Económico (precios parametrizables) ---
+# --- Económico (precios parametrizables, PVPC 2026, conservadores anti-overclaim) ---
+# retail = coste evitado del kWh autoconsumido (PVPC ~0,16-0,22 €/kWh, jun-2026).
+# compensation = compensación simplificada de excedentes (RD 244/2019), mecanismo cuarto-horario
+#   desde 2026; el excedente PVPC osciló ~0,06-0,10 €/kWh (jun-2026, REE/ESIOS). 0,06 = extremo
+#   conservador: no inflar el ahorro (spec §6 aviso anti-overclaim). Ver docs/2026-06-22-official-data-sources.md
 prices:
-  retail_eur_kwh: 0.20        # coste evitado autoconsumo (valor del kWh autoconsumido)
-  compensation_eur_kwh: 0.06  # compensación simplificada de excedentes (precio bajo)
+  retail_eur_kwh: 0.20
+  compensation_eur_kwh: 0.06
 
 # --- Legal (RDL 7/2026) ---
 legal:
