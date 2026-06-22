@@ -31,13 +31,24 @@ class AnnualSummary:
     participants: dict[str, Savings]     # per-household annual figures
 
 
-def annual_summary(cfg: ConcejoConfig, climatology: pd.DataFrame) -> AnnualSummary:
-    """Honest annual figures for ``cfg`` over the full climatology year (8760 h)."""
+def annual_summary(
+    cfg: ConcejoConfig,
+    climatology: pd.DataFrame,
+    demand_override: dict[str, list[float]] | None = None,
+) -> AnnualSummary:
+    """Honest annual figures for ``cfg`` over the full climatology year (8760 h).
+
+    ``demand_override`` (participant_id -> 24h day-type kWh) replaces the synthetic demand
+    curves, so an uploaded consumption profile flows through the same honest annual chain.
+    """
     gen = hourly_energy(climatology, cfg.site, cfg.pv)
     hours = climatology["hour"].astype(int).tolist()
-    day_demand = {p.id: daily_demand(p.profile, p.daily_kwh) for p in cfg.participants}
+    day_demand = demand_override or {
+        p.id: daily_demand(p.profile, p.daily_kwh) for p in cfg.participants
+    }
     demand = {pid: [day_demand[pid][h] for h in hours] for pid in day_demand}
-    priority = {p.id: p.renta_priority for p in cfg.participants}
+    base_priority = {p.id: p.renta_priority for p in cfg.participants}
+    priority = {pid: base_priority.get(pid, 2) for pid in day_demand}
 
     beta = compute_coefficients(gen, demand, priority)
     sav = compute_savings(
