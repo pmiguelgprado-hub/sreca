@@ -1,7 +1,14 @@
-"""Dashboard data layer — pure, testable (streamlit-fidelity: data layer separate from view).
+"""Persisted-run data layer — pure, testable (streamlit-fidelity: data separate from view).
 
 Reads the latest persisted run from SQLite and shapes it for display. No Streamlit imports
 here, so it unit-tests without a UI runtime.
+
+Note (2026-06-22): the interactive cockpit (``app.py``) now recomputes live from config +
+climatology via ``analytics.cockpit_bundle`` and does not read the DB, so ``load_dashboard_data``
+/ ``community_kpis`` / ``DashboardData`` serve the CLI batch-and-store path (``main.run_rebalance``)
+and its tests, not the live view. ``territory_context`` below is still used by the cockpit. This
+DB path is kept deliberately as the persistence/seed layer (a scheduled run, or a future API),
+not dead code.
 """
 from __future__ import annotations
 
