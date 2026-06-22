@@ -9,26 +9,30 @@ energía solar entre vecinos y desplaza cargas flexibles a las horas de sol — 
 
 ## Vista
 
-![Panel SRECA: cifras anuales y cómo funciona el cerebro](docs/img/overview.png)
+![Cockpit SRECA: KPIs en vivo, balance energético y curva del día medio](docs/img/overview.png)
 
-![Un día medio: generación solar frente al consumo de cada vecino](docs/img/chart.png)
+![Intensidad de generación hora × mes (mapa de calor)](docs/img/chart.png)
 
 ## Estado
 
-MVP funcional, presentable. Slice vertical completo extremo a extremo (PVGIS → forecast →
-optimizador → SQLite → dashboard), 76 tests, dashboard verificado headless. Demografía de los
-concejos verificada en fuente (INE, padrón 2025) y precios PVPC 2026 conservadores — ver
-`docs/2026-06-22-official-data-sources.md`. Datos de consumo sintéticos (ilustrativos) hasta
-disponer de curvas reales de los vecinos. Despliegue público (Streamlit Cloud) pendiente de
-configurar la app en share.streamlit.io.
+Cockpit interactivo funcional. Slice vertical completo extremo a extremo (PVGIS → forecast →
+optimizador → analítica → dashboard), 86 tests, verificado headless. Es una **herramienta**, no
+una presentación: los controles (potencia, precios, consumo por hogar, CSV de curvas reales)
+recalculan en vivo todas las cifras y gráficos. Demografía de los concejos verificada en fuente
+(INE, padrón 2025) y precios PVPC 2026 conservadores — ver `docs/2026-06-22-official-data-sources.md`.
+Datos de consumo sintéticos (ilustrativos) hasta cargar curvas reales de los vecinos. Despliegue
+público (Streamlit Cloud) pendiente de configurar la app en share.streamlit.io.
 
-## Cómo funciona (MVP)
+## Cómo funciona
 
 ```
-Open-Meteo → forecast FV (modelo físico) + forecast demanda (perfiles sintéticos)
-          → optimizador (coeficientes ex-ante + recomendación desplazamiento de carga)
-          → SQLite → dashboard Streamlit (producción · coeficientes · ahorro €/hogar)
+PVGIS (año tipo) → forecast FV físico + demanda (sintética o CSV subido)
+                 → optimizador (reparto ex-ante + desplazamiento de carga) + analítica
+                 → cockpit Streamlit: KPIs en vivo · balance · heatmap hora×mes · reparto · ahorro
 ```
+
+Controles que recalculan el modelo entero (sreca/dashboard/analytics.py, puro y testeado): tamaño
+de la planta, precios PVPC, consumo por hogar y subida de curvas reales (CSV, solo en sesión).
 
 Dos salidas legales distintas (norma vigente 2026):
 - **Perfil ex-ante anual** de coeficientes de reparto (revisable ≥4 meses, Orden TED/1247/2021).
@@ -41,8 +45,8 @@ config/concejos/   # parámetros por concejo (teverga.yaml). Replicar = añadir 
 sreca/ingest/      # cliente Open-Meteo
 sreca/forecast/    # producción FV (físico) + demanda (sintética)
 sreca/optimize/    # coeficientes + schedule ex-ante + load-shift + savings
-sreca/store/       # SQLite
-sreca/dashboard/   # Streamlit
+sreca/store/       # SQLite (default seed)
+sreca/dashboard/   # cockpit Streamlit (app.py) + analytics backbone puro (analytics.py)
 tests/             # TDD
 docs/              # spec de diseño + verificación legal 2026
 ```

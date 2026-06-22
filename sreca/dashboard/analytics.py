@@ -14,8 +14,11 @@ from dataclasses import dataclass
 import pandas as pd
 
 from sreca.concejo import ConcejoConfig
+from sreca.forecast.demand import daily_demand
 from sreca.forecast.pv import hourly_energy
-from sreca.report import AnnualSummary
+from sreca.optimize.coefficients import compute_coefficients
+from sreca.optimize.load_shift import recommend_flexible_load_shift
+from sreca.report import AnnualSummary, annual_summary
 
 
 @dataclass(frozen=True)
@@ -23,6 +26,20 @@ class EnergyBalance:
     self_consumed_kwh: float    # solar consumed by the community
     exported_kwh: float         # solar surplus exported to the grid
     grid_import_kwh: float      # demand not covered by solar (bought from the grid)
+
+
+@dataclass(frozen=True)
+class CockpitBundle:
+    """Everything the interactive cockpit renders, from one live recompute (pure)."""
+    annual: AnnualSummary
+    balance: EnergyBalance
+    monthly: dict[int, float]                 # month -> generation kWh
+    heatmap: pd.DataFrame                      # 12 months × 24 hours, mean gen kWh
+    gen_daytype: list[float]                   # 24h representative generation
+    demand_daytype: dict[str, list[float]]     # participant -> 24h demand
+    beta_daytype: dict[str, list[float]]       # participant -> 24h allocation β (Σ=1 per hour)
+    load_shift: dict[str, list[int]]           # flexible load -> recommended solar-window hours
+    coefficient_mode: str                      # legal regime in force (ex_ante)
 
 
 def apply_overrides(
@@ -84,6 +101,48 @@ def energy_balance(annual: AnnualSummary) -> EnergyBalance:
         self_consumed_kwh=annual.self_consumed_kwh,
         exported_kwh=annual.excess_kwh,
         grid_import_kwh=max(annual.demand_kwh - annual.self_consumed_kwh, 0.0),
+    )
+
+
+def _generation_daytype(cfg: ConcejoConfig, climatology: pd.DataFrame) -> list[float]:
+    """Representative 24h generation: mean hourly energy across all days of the year."""
+    df = climatology.assign(_gen=hourly_energy(climatology, cfg.site, cfg.pv))
+    return [float(df[df["hour"] == h]["_gen"].mean()) for h in range(24)]
+
+
+def cockpit_bundle(
+    cfg: ConcejoConfig,
+    climatology: pd.DataFrame,
+    demand_override: dict[str, list[float]] | None = None,
+) -> CockpitBundle:
+    """One live recompute producing every figure the cockpit shows (pure composition).
+
+    Honest annual numbers run the full 8760h chain (report.annual_summary); the day-type
+    series are the visual mean day. Both honour ``demand_override`` (an uploaded curve).
+    """
+    annual = annual_summary(cfg, climatology, demand_override=demand_override)
+
+    gen_dt = _generation_daytype(cfg, climatology)
+    demand_dt = demand_override or {
+        p.id: daily_demand(p.profile, p.daily_kwh) for p in cfg.participants
+    }
+    base_priority = {p.id: p.renta_priority for p in cfg.participants}
+    priority = {pid: base_priority.get(pid, 2) for pid in demand_dt}
+    beta_dt = compute_coefficients(gen_dt, demand_dt, priority)
+
+    flex = [fl for p in cfg.participants for fl in p.flexible_loads]
+    load_shift = recommend_flexible_load_shift(flex, gen_dt) if flex else {}
+
+    return CockpitBundle(
+        annual=annual,
+        balance=energy_balance(annual),
+        monthly=monthly_generation(cfg, climatology),
+        heatmap=generation_heatmap(cfg, climatology),
+        gen_daytype=gen_dt,
+        demand_daytype=demand_dt,
+        beta_daytype=beta_dt,
+        load_shift=load_shift,
+        coefficient_mode=cfg.legal.coefficient_mode,
     )
 
 

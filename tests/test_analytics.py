@@ -84,6 +84,30 @@ def test_demand_from_csv_rejects_malformed():
         analytics.demand_from_csv(pd.DataFrame({"hour": list(range(24))}))   # no participant col
 
 
+def test_cockpit_bundle_is_consistent_and_wires_every_field(teverga, clim):
+    b = analytics.cockpit_bundle(teverga, clim)
+    # annual matches the standalone honest engine
+    assert b.annual.gen_kwh == pytest.approx(annual_summary(teverga, clim).gen_kwh)
+    # balance conserves generation
+    assert b.balance.self_consumed_kwh + b.balance.exported_kwh == pytest.approx(b.annual.gen_kwh)
+    # monthly sums to annual
+    assert sum(b.monthly.values()) == pytest.approx(b.annual.gen_kwh, rel=1e-9)
+    # day-type series present and well-formed (resolves the previously-orphaned coefficients)
+    assert len(b.gen_daytype) == 24
+    for h in range(24):
+        assert sum(b.beta_daytype[p][h] for p in b.beta_daytype) == pytest.approx(1.0)
+    # load-shift wired (Route B), and only flexible loads appear (synergy invariant)
+    assert "tanque_frio_leche" in b.load_shift
+    assert "ordeno" not in b.load_shift
+    assert b.coefficient_mode == "ex_ante"
+
+
+def test_cockpit_bundle_reacts_to_overrides(teverga, clim):
+    base = analytics.cockpit_bundle(teverga, clim)
+    bigger = analytics.cockpit_bundle(analytics.apply_overrides(teverga, kwp=teverga.pv.kwp * 2), clim)
+    assert bigger.annual.gen_kwh == pytest.approx(2 * base.annual.gen_kwh, rel=1e-6)
+
+
 def test_annual_summary_accepts_demand_override(teverga, clim):
     # An uploaded flat 1 kWh/h curve for each participant → deterministic annual demand.
     override = {p.id: [1.0] * 24 for p in teverga.participants}
