@@ -87,7 +87,8 @@ Para publicar el enlace (un solo paso, requiere tu cuenta de GitHub):
 
 ## Contexto
 
-Propuesta para la Beca de Excelencia de la **Fundación Caja Rural de Asturias**. Proyecto de
+Propuesta para la **convocatoria de innovación (máster) de la Fundación Caja Rural de Asturias**
+— desarrollar un proyecto que ayude a la Asturias rural (cierre 31 de julio de 2026). Proyecto de
 desarrollo rural que usa la energía como herramienta. Replicable a otros concejos en riesgo de
 despoblación (Somiedo, Ponga, Allande, Ibias, Degaña, Quirós…) añadiendo su configuración y sus
 datos de recurso solar (PVGIS TMY, gratis); el software no cambia.

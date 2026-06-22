@@ -73,12 +73,12 @@ De `fundacioncajaruraldeasturias.com/innovacion-y-talento` y sus convocatorias p
   lleno: tecnología (cerebro software 0 €) + sostenibilidad (FV) + territorio (concejo rural) +
   impacto (reto demográfico + pobreza energética).
 
-> **Punto de orientación para Pablo (no bloquea el desarrollo):** las *Becas de Excelencia*
-> leídas como están son premios de **mérito académico**, no convocatorias de *presentación de
-> proyecto*. Los programas con encaje de proyecto son los empresariales ("Imagina tu empresa")
-> y el Premio Talento (trayectoria profesional, no estudiante). Conviene confirmar a qué
-> convocatoria concreta se presenta SRECA antes de calibrar la narrativa de la memoria. El
-> trabajo de app/datos vale bajo cualquier lectura.
+> **Convocatoria CONFIRMADA (Pablo, 2026-06-22):** SRECA se presenta a la **convocatoria de
+> innovación (máster)** de la Fundación Caja Rural de Asturias — desarrollar un proyecto que
+> ayude a la **Asturias rural**, **cierre 31 de julio de 2026**. Es una convocatoria de
+> *presentación de proyecto* (no de mérito académico), así que el encaje es directo: innovación
+> (cerebro software 0 €) + territorio rural + impacto social (reto demográfico, pobreza
+> energética). La narrativa de la app y de la memoria se calibra a esta convocatoria.
 
 ## 4. Decisión — perfiles de demanda REE diferidos a fase 2
 

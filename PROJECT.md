@@ -16,8 +16,9 @@ Documento de proyecto. El código vive en este repositorio.
 Cerebro software de una **Comunidad Energética Local** (piloto Teverga): autoconsumo colectivo
 FV 15 kWp + analítica predictiva (Open-Meteo + curvas de carga) que optimiza el perfil ex-ante
 de coeficientes de reparto y desplaza cargas flexibles a la ventana solar. Sin baterías.
-Stack coste-licencia **0 €** (Python/Streamlit/Open-Meteo/SQLite). Propuesta para la **Beca de
-Excelencia de la Fundación Caja Rural de Asturias**.
+Stack coste-licencia **0 €** (Python/Streamlit/Open-Meteo/SQLite). Propuesta para la
+**convocatoria de innovación (máster) de la Fundación Caja Rural de Asturias**: desarrollar un
+proyecto que ayude a la Asturias rural (cierre 31 de julio de 2026).
 
 ## Estado
 
